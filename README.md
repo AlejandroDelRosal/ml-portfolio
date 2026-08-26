@@ -4,6 +4,7 @@ A collection of machine learning models, growing over time with new examples: fr
 
 ## Contents
 
+- [`time-series-forecasting/`](time-series-forecasting/): naive, seasonal naive, Holt-Winters, and ARIMA forecasts on real US unemployment data, compared with the Diebold-Mariano statistical test
 - `credit-risk-scoring/`: ML pipeline for loan default prediction (Random Forest, class weighting for imbalanced datasets, feature importance for regulatory explainability)
 - `software-foundations/`: supporting software engineering work
   - `geometry_toolkit.py`: object-oriented 2D/3D geometry engine (inheritance, vector calculus)
@@ -12,7 +13,6 @@ A collection of machine learning models, growing over time with new examples: fr
 ## Roadmap
 
 - [ ] Fraud detection
-- [ ] Time series forecasting
 - [ ] Recommendation system
 - [ ] Computer vision classifier (CNN)
 - [ ] NLP fine-tuning (transformers)
