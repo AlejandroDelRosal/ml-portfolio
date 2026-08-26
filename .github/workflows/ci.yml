@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   lint-and-test:
@@ -20,13 +21,25 @@ jobs:
           pip install ruff pytest
       - name: Lint (ruff)
         run: ruff check . --exit-zero
-      - name: Test each project
+      - name: Test requirements.txt projects
         run: |
           status=0
           for req in $(find . -mindepth 2 -name requirements.txt); do
             project_dir=$(dirname "$req")
             echo "Testing $project_dir"
             pip install -r "$req"
+            (cd "$project_dir" && python -m pytest -q) || status=1
+          done
+          exit $status
+      - name: Test packaged projects
+        env:
+          PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu
+        run: |
+          status=0
+          for manifest in $(find . -mindepth 2 -name pyproject.toml); do
+            project_dir=$(dirname "$manifest")
+            echo "Testing $project_dir"
+            pip install -e "$project_dir[dev]"
             (cd "$project_dir" && python -m pytest -q) || status=1
           done
           exit $status
