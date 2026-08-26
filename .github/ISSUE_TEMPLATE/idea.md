@@ -1,13 +1,13 @@
 ---
-name: Idea / mejora
-about: Proponer un nuevo experimento, modelo o mejora para este repo
+name: Idea / Enhancement
+about: Propose a new experiment, model, or improvement for this repo
 title: ""
 labels: enhancement
 ---
 
-**Descripción**
+**Description**
 
-**Motivación / contexto**
+**Motivation**
 
-**Definición de listo**
+**Definition of done**
 - [ ]

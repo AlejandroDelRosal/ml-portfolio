@@ -1,12 +1,12 @@
 ---
 name: Bug
-about: Reportar algo que no funciona como se esperaba
+about: Report something that is not working as expected
 title: ""
 labels: bug
 ---
 
-**Qué pasó**
+**What happened**
 
-**Qué se esperaba**
+**What was expected**
 
-**Cómo reproducirlo**
+**How to reproduce**
