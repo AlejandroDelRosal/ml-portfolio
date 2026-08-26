@@ -14,12 +14,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install dependencies
+      - name: Install base dependencies
         run: |
           python -m pip install --upgrade pip
           pip install ruff pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Lint (ruff)
         run: ruff check . --exit-zero
-      - name: Tests (pytest)
-        run: pytest -q || echo "No hay tests todavia"
+      - name: Test each project
+        run: |
+          status=0
+          for req in $(find . -mindepth 2 -name requirements.txt); do
+            project_dir=$(dirname "$req")
+            echo "Testing $project_dir"
+            pip install -r "$req"
+            (cd "$project_dir" && python -m pytest -q) || status=1
+          done
+          exit $status
