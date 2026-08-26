@@ -1,6 +1,6 @@
-## Qué hace este PR
+## What this PR does
 
-## Tipo de cambio
+## Type of change
 - [ ] feat
 - [ ] fix
 - [ ] docs
@@ -9,6 +9,6 @@
 - [ ] chore
 
 ## Checklist
-- [ ] Corre localmente / notebook ejecuta de arriba a abajo
-- [ ] README actualizado si aplica
-- [ ] CHANGELOG actualizado
+- [ ] Runs locally / notebook executes end to end
+- [ ] README updated if applicable
+- [ ] CHANGELOG updated

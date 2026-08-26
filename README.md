@@ -1,27 +1,19 @@
 # ML Portfolio
 
-Vitrina de modelos de machine learning — este repo va a ir creciendo a lo largo del año con nuevos ejemplos (fraude, forecasting, recomendadores, visión por computadora, NLP con transformers, tracking de experimentos). Parte del [portafolio híbrido](https://github.com/AlejandroDelRosal/Portafolio) de Manuel Alejandro Del Rosal.
+A collection of machine learning models, growing over time with new examples: fraud detection, forecasting, recommender systems, computer vision, and NLP. Part of the [portfolio](https://github.com/AlejandroDelRosal/Portafolio) of Manuel Alejandro Del Rosal.
 
-## Contenido actual
+## Contents
 
-- **`credit-risk-scoring/`** — pipeline de ML para predicción de default (Random Forest, class weighting para datasets desbalanceados, feature importance para explicabilidad regulatoria)
-- **`software-foundations/`** — fundamentos de ingeniería de software que sostienen los proyectos de arriba
-  - `geometry_toolkit.py` — motor de geometría 2D/3D orientado a objetos (herencia, cálculo vectorial)
-  - `palindromos/` — librería de procesamiento de strings (normalización Unicode, algoritmos O(n))
+- `credit-risk-scoring/`: ML pipeline for loan default prediction (Random Forest, class weighting for imbalanced datasets, feature importance for regulatory explainability)
+- `software-foundations/`: supporting software engineering work
+  - `geometry_toolkit.py`: object-oriented 2D/3D geometry engine (inheritance, vector calculus)
+  - `palindromos/`: string processing library (Unicode normalization, O(n) algorithms)
 
 ## Roadmap
 
-- [ ] Detección de fraude
-- [ ] Forecasting de series de tiempo
-- [ ] Sistema de recomendación
-- [ ] Clasificador de visión por computadora (CNN)
-- [ ] Fine-tuning de un modelo de NLP (transformers)
-- [ ] Tracking de experimentos con MLflow
-
-## Convenciones
-
-`main` protegido, todo por PR, conventional commits, CI con lint + tests. Ver [CHANGELOG.md](CHANGELOG.md).
-
-## Licencia
-
-MIT — ver [LICENSE](LICENSE).
+- [ ] Fraud detection
+- [ ] Time series forecasting
+- [ ] Recommendation system
+- [ ] Computer vision classifier (CNN)
+- [ ] NLP fine-tuning (transformers)
+- [ ] Experiment tracking with MLflow
