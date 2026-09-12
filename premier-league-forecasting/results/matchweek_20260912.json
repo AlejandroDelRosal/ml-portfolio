@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-12T19:37:39.167961",
+  "generated_at": "2026-09-12T21:01:23.486012",
   "settings": {
     "xi": 0.003,
     "weight": 0.0,
@@ -7,24 +7,6 @@
     "demonstrable_edge": false
   },
   "fixtures": [
-    {
-      "Datetime": "2026-09-12T20:00:00.000",
-      "HomeTeam": "Sunderland",
-      "AwayTeam": "Arsenal",
-      "AvgH": 7.36,
-      "AvgD": 4.12,
-      "AvgA": 1.46,
-      "p_home": 0.1182362482,
-      "p_draw": 0.2231083265,
-      "p_away": 0.6586554253,
-      "p_home_model": 0.1343889149,
-      "p_draw_model": 0.2713611107,
-      "p_away_model": 0.5942499744,
-      "p_home_market": 0.1182362482,
-      "p_draw_market": 0.2231083265,
-      "p_away_market": 0.6586554253,
-      "Season": "2026-27"
-    },
     {
       "Datetime": "2026-09-13T14:00:00.000",
       "HomeTeam": "Coventry",
