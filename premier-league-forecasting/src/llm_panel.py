@@ -172,6 +172,24 @@ def snapshot(panel: dict, fixtures: pd.DataFrame, asked_at: pd.Timestamp) -> dic
     return {"asked_at": asked_at.isoformat(), "models": list(panel), "fixtures": rows}
 
 
+def published_snapshot(records: pd.DataFrame, now: pd.Timestamp) -> dict | None:
+    """The panel as it stands for the fixtures still ahead, taken from the archive.
+
+    Reading the archive rather than the run's own answers means the page shows
+    the asking that counts: deduplication keeps the earliest, and a later run
+    that asked again about the same fixture does not overwrite it.
+    """
+    ahead = records[records["Datetime"] > now]
+    if ahead.empty:
+        return None
+    fixtures = ahead[FIXTURE_KEY].drop_duplicates().sort_values("Datetime").reset_index(drop=True)
+    panel = {
+        model: fixtures.merge(group, on=FIXTURE_KEY, how="left")[PROBABILITY_COLUMNS]
+        for model, group in ahead.groupby("model")
+    }
+    return snapshot(panel, fixtures, ahead["asked_at"].min())
+
+
 def unasked(fixtures: pd.DataFrame, records: pd.DataFrame) -> pd.DataFrame:
     """Fixtures with no forecast on file, so running twice never asks twice."""
     if records.empty:

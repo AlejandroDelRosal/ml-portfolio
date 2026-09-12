@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from src import metrics
 from src.metrics import accuracy, calibration_table, compare, evaluate, log_loss
 
 PERFECT = [[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]]
@@ -57,3 +58,36 @@ def test_a_calibrated_forecast_has_observed_close_to_predicted():
 def test_compare_sorts_by_rps():
     table = compare({"good": evaluate([[0.9, 0.05, 0.05]], [0]), "bad": evaluate(UNIFORM, [0])})
     assert list(table.index) == ["good", "bad"]
+
+
+SURE = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]])
+EVEN = np.tile([1 / 3, 1 / 3, 1 / 3], (4, 1))
+RESULTS = np.array([0, 1, 2, 0])
+MATCHDAYS = np.array(["a", "a", "b", "b"])
+
+
+def test_a_perfect_forecast_scores_zero_on_every_match():
+    assert metrics.rps_per_match(SURE, RESULTS).tolist() == [0.0, 0.0, 0.0, 0.0]
+
+
+def test_the_per_match_scores_average_to_the_usual_one():
+    average = metrics.evaluate(EVEN, RESULTS)["rps"]
+    assert metrics.rps_per_match(EVEN, RESULTS).mean() == pytest.approx(average)
+
+
+def test_a_forecaster_that_is_strictly_better_clears_zero():
+    interval = metrics.paired_rps_interval(SURE, EVEN, RESULTS, MATCHDAYS, draws=200)
+    assert interval["low"] > 0
+    assert interval["better_share"] == 1.0
+
+
+def test_two_identical_forecasters_separate_by_nothing():
+    interval = metrics.paired_rps_interval(EVEN, EVEN, RESULTS, MATCHDAYS, draws=200)
+    assert interval["mean"] == 0.0
+    assert interval["low"] == 0.0 and interval["high"] == 0.0
+
+
+def test_the_interval_is_reproducible_for_a_given_seed():
+    first = metrics.paired_rps_interval(SURE, EVEN, RESULTS, MATCHDAYS, draws=200, seed=3)
+    second = metrics.paired_rps_interval(SURE, EVEN, RESULTS, MATCHDAYS, draws=200, seed=3)
+    assert first == second

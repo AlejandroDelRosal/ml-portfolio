@@ -8,3 +8,6 @@ results/matchweek_*.json
 results/predictions_*.csv
 results/llm_panel/
 results/panel_latest.json
+
+# Left behind by the soccerdata scraper.
+downloaded_files/

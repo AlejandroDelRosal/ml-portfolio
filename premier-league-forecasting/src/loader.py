@@ -56,6 +56,29 @@ def _parse_datetime(frame: pd.DataFrame) -> pd.Series:
     return pd.to_datetime(stamp, format="%Y-%m-%d %H:%M", errors="coerce")
 
 
+def attach_xg(season: pd.DataFrame, sidecar: pd.DataFrame) -> pd.DataFrame:
+    """Fill missing expected goals from a sidecar, keyed on the pairing.
+
+    A pairing occurs once per season, so it identifies the match without leaning
+    on a kick-off time that may have moved since either file was written.
+    """
+    key = ["HomeTeam", "AwayTeam"]
+    filled = season.copy()
+    for column in XG_COLUMNS:
+        if column not in filled.columns:
+            filled[column] = pd.NA
+    merged = filled.merge(sidecar[key + XG_COLUMNS], on=key, how="left", suffixes=("", "_sidecar"))
+    for column in XG_COLUMNS:
+        # The sidecar wins. football-data publishes expected goals only from
+        # 2026-27 and from a different provider, so deferring to it would fit the
+        # model on two definitions of a chance with a break between them. What
+        # the season file publishes is kept only where the sidecar has nothing.
+        published = pd.to_numeric(merged[column], errors="coerce")
+        incoming = pd.to_numeric(merged[f"{column}_sidecar"], errors="coerce")
+        filled[column] = incoming.fillna(published).values
+    return filled
+
+
 def load_season(path: pathlib.Path) -> pd.DataFrame:
     frame = pd.read_csv(path, encoding="utf-8-sig")
     frame = frame[frame["HomeTeam"].notna()].copy()
@@ -65,6 +88,9 @@ def load_season(path: pathlib.Path) -> pd.DataFrame:
     frame = frame[CANONICAL_COLUMNS].copy()
     frame["Season"] = season_label(path)
     frame["Datetime"] = _parse_datetime(frame)
+    sidecar = path.parent / f"xg_{path.stem}.csv"
+    if sidecar.exists():
+        frame = attach_xg(frame, pd.read_csv(sidecar, encoding="utf-8-sig"))
     for column in NUMERIC_COLUMNS:
         frame[column] = pd.to_numeric(frame[column], errors="coerce")
     return frame

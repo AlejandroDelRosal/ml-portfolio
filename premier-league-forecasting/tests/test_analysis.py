@@ -5,7 +5,7 @@ import re
 import pandas as pd
 import pytest
 
-from analysis import predict_next, run_panel
+from analysis import predict_next, run_backtest, run_panel
 from src import llm_panel
 
 ROOT = pathlib.Path(__file__).parent.parent
@@ -110,19 +110,25 @@ def _refuse(message):
     return refuse
 
 
-def test_the_report_snapshot_is_written_when_the_panel_answers(panel, monkeypatch, tmp_path):
+def test_the_report_snapshot_is_published_from_the_archive(panel, monkeypatch, tmp_path):
     answers = llm_panel.parse_response(json.dumps([
         {"home": "Arsenal", "away": "Chelsea", "p_home": 0.5, "p_draw": 0.25, "p_away": 0.25},
         {"home": "Hull", "away": "Man United", "p_home": 0.2, "p_draw": 0.3, "p_away": 0.5},
     ]), UPCOMING)
+    archive = tmp_path / "llm_panel"
+    llm_panel.record({"a:free": answers}, UPCOMING, asked_at=pd.Timestamp("2026-09-18 09:00"), directory=archive)
     monkeypatch.setattr(panel, "RESULTS_DIR", tmp_path)
-    monkeypatch.setattr(panel, "load_records", lambda: llm_panel.load_records(tmp_path))
-    monkeypatch.setattr(panel, "run_panel", lambda fixtures, models: {"a:free": answers})
-    monkeypatch.setattr(panel, "record", lambda *args, **kwargs: tmp_path / "panel.csv")
-    panel.ask(pd.Timestamp("2026-09-18 10:00"))
-    written = json.loads((tmp_path / "panel_latest.json").read_text())
+    monkeypatch.setattr(panel, "load_records", lambda: llm_panel.load_records(archive))
+    written = json.loads(panel.publish(pd.Timestamp("2026-09-18 10:00")).read_text())
     assert written["models"] == ["a:free"]
     assert len(written["fixtures"]) == 2
+    assert written["asked_at"].startswith("2026-09-18T09:00")
+
+
+def test_nothing_is_published_when_no_recorded_fixture_is_ahead(panel, monkeypatch, tmp_path):
+    monkeypatch.setattr(panel, "RESULTS_DIR", tmp_path)
+    monkeypatch.setattr(panel, "load_records", lambda: llm_panel.load_records(tmp_path))
+    assert panel.publish(pd.Timestamp("2026-09-18 10:00")) is None
 
 
 WORKFLOW = ROOT.parent / ".github" / "workflows" / "forecast.yml"
@@ -137,3 +143,31 @@ def test_the_scheduled_workflow_calls_only_modules_that_exist():
 
 def test_the_scheduled_workflow_skips_the_panel_without_a_key():
     assert "OPENROUTER_API_KEY" in WORKFLOW.read_text()
+
+
+def prediction_frame(probabilities):
+    return pd.DataFrame({
+        "Datetime": [pd.Timestamp("2026-09-19 14:00"), pd.Timestamp("2026-09-20 16:30")],
+        "FTHG": [2, 0], "FTAG": [0, 1],
+        "p_home": [p[0] for p in probabilities],
+        "p_draw": [p[1] for p in probabilities],
+        "p_away": [p[2] for p in probabilities],
+    })
+
+
+def test_significance_names_each_pair_it_was_asked_for():
+    predictions = {
+        "market_closing": prediction_frame([[0.9, 0.05, 0.05], [0.05, 0.05, 0.9]]),
+        "model": prediction_frame([[0.34, 0.33, 0.33], [0.33, 0.33, 0.34]]),
+    }
+    common = predictions["model"].index
+    found = run_backtest.significance(predictions, common, [("market_closing", "model")], draws=100)
+    assert list(found) == ["market_closing_vs_model"]
+    assert found["market_closing_vs_model"]["mean"] > 0
+
+
+def test_significance_reports_an_interval_that_can_cross_zero():
+    even = prediction_frame([[0.34, 0.33, 0.33], [0.33, 0.33, 0.34]])
+    predictions = {"market_closing": even, "model": even.copy()}
+    found = run_backtest.significance(predictions, even.index, [("market_closing", "model")], draws=100)
+    assert found["market_closing_vs_model"]["low"] == 0.0

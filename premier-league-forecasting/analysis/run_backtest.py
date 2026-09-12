@@ -12,8 +12,8 @@ import pandas as pd
 from src.backtest import priced, walk_forward
 from src.loader import load_matches
 from src.market import MarketPredictor
-from src.metrics import compare, evaluate
-from src.models import OUTCOME_COLUMNS, GoalModel
+from src.metrics import compare, evaluate, paired_rps_interval
+from src.models import EXPECTED_GOALS, OUTCOME_COLUMNS, GoalModel
 from src.ratings import EloPredictor, PiRatingsPredictor, result_codes
 
 RESULTS_DIR = pathlib.Path(__file__).parent.parent / "results"
@@ -39,6 +39,25 @@ def tune_decay(matches: pd.DataFrame) -> float:
     return best
 
 
+# The table shows gaps; these say which of them survive resampling.
+SIGNIFICANT_PAIRS = [
+    ("market_closing", "dixon_coles"),
+    ("dixon_coles_xg", "dixon_coles"),
+]
+
+
+def significance(predictions: dict, common, pairs: list[tuple[str, str]], draws: int = 10_000) -> dict:
+    reference = predictions["market_closing"].loc[common]
+    codes = result_codes(reference)
+    days = reference["Datetime"].dt.date.to_numpy()
+    probabilities = {name: frame.loc[common][OUTCOME_COLUMNS].to_numpy() for name, frame in predictions.items()}
+    return {
+        f"{better}_vs_{worse}": paired_rps_interval(probabilities[better], probabilities[worse], codes, days, draws=draws)
+        for better, worse in pairs
+        if better in probabilities and worse in probabilities
+    }
+
+
 def run() -> dict:
     matches = load_matches()
     xi = tune_decay(matches)
@@ -50,6 +69,8 @@ def run() -> dict:
         "poisson": lambda: GoalModel("poisson", xi=xi),
         "dixon_coles": lambda: GoalModel("dixon_coles", xi=xi),
         "bivariate_poisson": lambda: GoalModel("bivariate_poisson", xi=xi),
+        # Fitted on chances created rather than on the finishing that followed.
+        "dixon_coles_xg": lambda: GoalModel("dixon_coles", xi=xi, target=EXPECTED_GOALS),
     }
 
     print("\nBacktesting on", ", ".join(TEST_SEASONS))
@@ -65,9 +86,17 @@ def run() -> dict:
         common = index if common is None else common.intersection(index)
 
     results = {name: score(frame.loc[common]) for name, frame in predictions.items()}
+    intervals = significance(predictions, common, SIGNIFICANT_PAIRS)
     table = compare(results)
     print(f"\n=== Walk-forward results on {len(common)} common matches ===")
     print(table.to_string(float_format=lambda value: f"{value:.5f}"))
+    print("\nDoes the gap survive resampling whole matchdays?")
+    for pair, interval in intervals.items():
+        verdict = "yes" if interval["low"] > 0 else "no, the interval crosses zero"
+        print(
+            f"  {pair.replace('_vs_', ' over ')}: {interval['mean']:+.5f} RPS, "
+            f"95% [{interval['low']:+.5f}, {interval['high']:+.5f}], {verdict}"
+        )
 
     RESULTS_DIR.mkdir(exist_ok=True)
     payload = {
@@ -76,6 +105,7 @@ def run() -> dict:
         "test_seasons": TEST_SEASONS,
         "matches": int(len(common)),
         "results": results,
+        "significance": intervals,
     }
     (RESULTS_DIR / "backtest.json").write_text(json.dumps(payload, indent=2))
     for name, frame in predictions.items():

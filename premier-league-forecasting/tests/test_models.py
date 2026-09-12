@@ -103,3 +103,37 @@ def test_unknown_model_name_is_rejected():
 def test_predicting_before_fitting_is_rejected():
     with pytest.raises(RuntimeError):
         GoalModel().predict(synthetic_matches().head(1))
+
+
+def with_expected_goals(matches: pd.DataFrame, seed: int = 7) -> pd.DataFrame:
+    rng = np.random.default_rng(seed)
+    return matches.assign(
+        HxG=rng.gamma(shape=3.0, scale=0.5, size=len(matches)),
+        AxG=rng.gamma(shape=2.5, scale=0.5, size=len(matches)),
+    )
+
+
+def test_the_default_target_is_goals():
+    assert GoalModel().target == ("FTHG", "FTAG")
+
+
+def test_a_model_can_be_fitted_on_expected_goals():
+    matches = with_expected_goals(synthetic_matches())
+    model = GoalModel(target=("HxG", "AxG")).fit(matches)
+    priced = model.predict(matches.tail(4))
+    assert priced[PROBABILITY_COLUMNS[:3]].notna().all(axis=None)
+    assert priced[PROBABILITY_COLUMNS[:3]].sum(axis=1).round(6).eq(1.0).all()
+
+
+def test_expected_goals_and_goals_do_not_produce_the_same_forecast():
+    matches = with_expected_goals(synthetic_matches())
+    on_goals = GoalModel().fit(matches).predict(matches.tail(4))
+    on_xg = GoalModel(target=("HxG", "AxG")).fit(matches).predict(matches.tail(4))
+    assert not np.allclose(on_goals["p_home"], on_xg["p_home"])
+
+
+def test_a_match_without_expected_goals_is_left_out_of_the_fit():
+    matches = with_expected_goals(synthetic_matches())
+    matches.loc[matches.index[:20], ["HxG", "AxG"]] = np.nan
+    model = GoalModel(target=("HxG", "AxG")).fit(matches)
+    assert model.predict(matches.tail(4))["p_home"].notna().all()

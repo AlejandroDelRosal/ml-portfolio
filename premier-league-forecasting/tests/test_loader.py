@@ -3,6 +3,7 @@ import pathlib
 import pandas as pd
 import pytest
 
+from src import loader
 from src.loader import (
     CANONICAL_COLUMNS,
     load_fixtures,
@@ -122,3 +123,52 @@ def test_fixtures_are_chronological_and_dated():
     assert upcoming["Datetime"].is_monotonic_increasing
     assert upcoming["Datetime"].notna().all()
     assert set(upcoming["Season"]) == {"2026-27"}
+
+
+XG_SIDECAR = pd.DataFrame({
+    "HomeTeam": ["Man City", "Arsenal"],
+    "AwayTeam": ["Nott'm Forest", "Wolves"],
+    "HxG": [2.31, 1.04],
+    "AxG": [0.42, 1.55],
+})
+XG_SEASON = pd.DataFrame({
+    "HomeTeam": ["Man City", "Arsenal"],
+    "AwayTeam": ["Nott'm Forest", "Wolves"],
+    "HxG": [pd.NA, pd.NA],
+    "AxG": [pd.NA, pd.NA],
+})
+
+
+def test_expected_goals_are_attached_by_the_pairing():
+    filled = loader.attach_xg(XG_SEASON, XG_SIDECAR)
+    assert list(filled["HxG"]) == [2.31, 1.04]
+    assert list(filled["AxG"]) == [0.42, 1.55]
+
+
+def test_attaching_expected_goals_keeps_the_season_in_its_own_order():
+    filled = loader.attach_xg(XG_SEASON, XG_SIDECAR.iloc[::-1])
+    assert list(filled["HomeTeam"]) == ["Man City", "Arsenal"]
+    assert list(filled["HxG"]) == [2.31, 1.04]
+
+
+def test_a_match_the_sidecar_does_not_cover_keeps_its_missing_expected_goals():
+    filled = loader.attach_xg(XG_SEASON, XG_SIDECAR.head(1))
+    assert filled["HxG"].iloc[0] == 2.31
+    assert pd.isna(filled["HxG"].iloc[1])
+
+
+def test_the_sidecar_wins_so_one_provider_covers_every_season():
+    # football-data publishes its own expected goals from 2026-27 only. Letting
+    # those win would fit the model on two different definitions of a chance,
+    # with a systematic break at the season boundary.
+    published = XG_SEASON.assign(HxG=[9.99, pd.NA])
+    filled = loader.attach_xg(published, XG_SIDECAR)
+    assert filled["HxG"].iloc[0] == 2.31
+    assert filled["HxG"].iloc[1] == 1.04
+
+
+def test_a_match_the_sidecar_misses_keeps_what_the_season_file_published():
+    published = XG_SEASON.assign(HxG=[9.99, 8.88])
+    filled = loader.attach_xg(published, XG_SIDECAR.head(1))
+    assert filled["HxG"].iloc[0] == 2.31
+    assert filled["HxG"].iloc[1] == 8.88
