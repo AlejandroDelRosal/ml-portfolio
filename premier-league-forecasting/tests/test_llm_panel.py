@@ -221,3 +221,31 @@ def test_a_snapshot_omits_a_fixture_a_model_did_not_price():
 def test_a_snapshot_is_json_serialisable():
     snapshot = llm_panel.snapshot(two_model_panel(), FIXTURES, asked_at=pd.Timestamp("2026-09-18 09:00"))
     assert json.loads(json.dumps(snapshot))["asked_at"].startswith("2026-09-18")
+
+
+def store_full(directory, asked_at):
+    text = reply([
+        {"home": "Arsenal", "away": "Chelsea", "p_home": 0.5, "p_draw": 0.25, "p_away": 0.25},
+        {"home": "Hull", "away": "Man United", "p_home": 0.2, "p_draw": 0.3, "p_away": 0.5},
+    ])
+    record({"a:free": parse_response(text, FIXTURES)}, FIXTURES, asked_at=asked_at, directory=directory)
+
+
+def test_nothing_is_published_once_every_recorded_fixture_has_kicked_off(tmp_path):
+    store_full(tmp_path, pd.Timestamp("2026-09-18 09:00"))
+    published = llm_panel.published_snapshot(load_records(tmp_path), pd.Timestamp("2026-09-20 12:00"))
+    assert published is None
+
+
+def test_a_published_snapshot_covers_only_the_fixtures_still_ahead(tmp_path):
+    store_full(tmp_path, pd.Timestamp("2026-09-18 09:00"))
+    published = llm_panel.published_snapshot(load_records(tmp_path), pd.Timestamp("2026-09-19 15:00"))
+    assert [row["home"] for row in published["fixtures"]] == ["Hull"]
+
+
+def test_a_published_snapshot_is_stamped_with_the_earliest_asking(tmp_path):
+    store_full(tmp_path, pd.Timestamp("2026-09-18 09:00"))
+    store_full(tmp_path, pd.Timestamp("2026-09-17 09:00"))
+    published = llm_panel.published_snapshot(load_records(tmp_path), pd.Timestamp("2026-09-19 10:00"))
+    assert published["asked_at"].startswith("2026-09-17")
+    assert published["models"] == ["a:free"]

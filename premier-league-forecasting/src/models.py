@@ -36,24 +36,40 @@ def appearance_labels(matches: pd.DataFrame, threshold: int = PROMOTED_MATCHES):
     return home_labels, away_labels, appearances
 
 
+GOALS = ("FTHG", "FTAG")
+EXPECTED_GOALS = ("HxG", "AxG")
+# Goals are counts; expected goals are not, and rounding them would throw away
+# the fraction of a chance that separates a good shot from a tap-in.
+TARGET_DTYPES = {GOALS: np.int64, EXPECTED_GOALS: np.float64}
+
+
 class GoalModel:
-    def __init__(self, name: str = DEFAULT_MODEL, xi: float = DEFAULT_XI, threshold: int = PROMOTED_MATCHES):
+    def __init__(
+        self,
+        name: str = DEFAULT_MODEL,
+        xi: float = DEFAULT_XI,
+        threshold: int = PROMOTED_MATCHES,
+        target: tuple[str, str] = GOALS,
+    ):
         if name not in MODEL_CLASSES:
             raise KeyError(f"unknown model {name}; choose from {sorted(MODEL_CLASSES)}")
         self.name = name
         self.xi = xi
         self.threshold = threshold
+        self.target = tuple(target)
         self.model = None
         self.appearances: dict[str, int] = {}
         self.teams: set[str] = set()
 
     def fit(self, matches: pd.DataFrame) -> "GoalModel":
-        played = matches.dropna(subset=["FTHG", "FTAG"])
+        home_column, away_column = self.target
+        played = matches.dropna(subset=[home_column, away_column])
         home_labels, away_labels, appearances = appearance_labels(played, self.threshold)
         weights = pb.models.dixon_coles_weights(played["Datetime"], xi=self.xi) if self.xi else None
+        dtype = TARGET_DTYPES.get(self.target, np.float64)
         self.model = MODEL_CLASSES[self.name](
-            writable(played["FTHG"], np.int64),
-            writable(played["FTAG"], np.int64),
+            writable(played[home_column], dtype),
+            writable(played[away_column], dtype),
             np.array(home_labels, dtype=object),
             np.array(away_labels, dtype=object),
             weights=np.asarray(weights, dtype=np.float64).copy() if weights is not None else None,

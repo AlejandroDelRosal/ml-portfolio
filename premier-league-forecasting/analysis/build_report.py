@@ -4,6 +4,7 @@ Published pages cannot fetch anything at runtime, so every number is baked in
 at build time.
 """
 
+import hashlib
 import html
 import json
 import pathlib
@@ -152,6 +153,9 @@ PAGE = Template("""<title>Closing Line Report</title>
   .point { fill: var(--accent); }
   .trace { stroke: var(--accent); stroke-width: 2; fill: none; }
 
+  .intervals { margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--muted); }
+  .intervals li { margin-bottom: 4px; }
+  .intervals strong { color: var(--ink); font-weight: 600; }
   footer { color: var(--muted); font-size: 0.82rem; border-top: 1px solid var(--edge); padding-top: 16px; }
   code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; }
   @media (max-width: 560px) { .split { width: 130px; } }
@@ -190,6 +194,7 @@ $panel
     <h2>Walk-forward standings</h2>
     <p class="lede">$standings_note</p>
     <div class="scroll">$standings</div>
+    $significance
   </section>
 
   <section>
@@ -323,6 +328,26 @@ def standings_table(backtest: dict) -> str:
     return f'<table class="leader"><thead>{header}</thead><tbody>{"".join(rows)}</tbody></table>'
 
 
+def significance_note(backtest: dict) -> str:
+    """Which gaps in the table survive resampling, and which are noise."""
+    intervals = backtest.get("significance", {})
+    if not intervals:
+        return ""
+    lines = []
+    for pair, interval in intervals.items():
+        holds = interval["low"] > 0
+        verdict = "holds" if holds else "crosses zero, so the gap is not demonstrable"
+        lines.append(
+            f'<li><strong>{html.escape(pair.replace("_vs_", " over ").replace("_", " "))}</strong>: '
+            f'{interval["mean"]:+.5f} RPS, 95% [{interval["low"]:+.5f}, {interval["high"]:+.5f}] &mdash; {verdict}</li>'
+        )
+    return (
+        '<p class="lede">Whole matchdays resampled 10,000 times, because forecasts made for the same day '
+        "share whatever the model understood or missed about that week.</p>"
+        f'<ul class="intervals">{"".join(lines)}</ul>'
+    )
+
+
 def calibration_chart(baseline: dict) -> str:
     table = baseline.get("calibration", [])
     if not table:
@@ -408,7 +433,7 @@ def build() -> str:
 
     # The studies are the authority on these; the matchweek file may predate them.
     weights = betting.get("weights", {})
-    return PAGE.substitute(
+    page = PAGE.substitute(
         season=matchweek.get("fixtures", [{}])[0].get("Season", "2026-27") if matchweek.get("fixtures") else "2026-27",
         generated=str(matchweek.get("generated_at", ""))[:10] or "pending",
         subtitle="A forecast that cannot beat that price is not a signal, and the page says so.",
@@ -419,6 +444,7 @@ def build() -> str:
         matchweek=matchweek_table(matchweek),
         panel=panel_section(panel, panel_scores),
         standings=standings_table(backtest),
+        significance=significance_note(backtest),
         standings_note=(
             f"Walk-forward over {', '.join(backtest.get('test_seasons', []))}, {backtest.get('matches', 0)} matches, "
             "every forecaster judged on exactly the same fixtures."
@@ -429,6 +455,9 @@ def build() -> str:
         xi=backtest.get("xi", settings.get("xi", "unset")),
         weight=weights.get("opening", betting.get("weight", settings.get("weight", "unset"))),
     )
+    # The publisher compares this to decide whether the live page is stale, so it
+    # tracks the content and nothing else: no clock, no run identifier.
+    return f"{page}<!-- fingerprint {hashlib.sha256(page.encode()).hexdigest()[:12]} -->\n"
 
 
 def main() -> pathlib.Path:

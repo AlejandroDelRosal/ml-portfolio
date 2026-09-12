@@ -9,7 +9,7 @@ import pathlib
 
 import pandas as pd
 
-from src.llm_panel import PANEL_SIZE, free_models, load_records, record, run_panel, snapshot, unasked
+from src.llm_panel import PANEL_SIZE, free_models, load_records, published_snapshot, record, run_panel, unasked
 from src.loader import league_now, load_fixtures, load_matches
 from src.market import MarketPredictor, OPENING_ODDS
 from src.metrics import compare, evaluate
@@ -39,14 +39,23 @@ def ask(now: pd.Timestamp) -> dict:
         print("No model answered usably.")
         return {}
     path = record(panel, fixtures, asked_at=now)
-    # The report reads JSON only, so the panel is published in a shape it can use.
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    (RESULTS_DIR / "panel_latest.json").write_text(json.dumps(snapshot(panel, fixtures, now), indent=2))
     print(f"\nRecorded {len(panel)} model answers in {path}")
     for model, predictions in panel.items():
         answered = predictions[OUTCOME_COLUMNS].notna().all(axis=1).sum()
         print(f"  {model}: {answered}/{len(fixtures)} fixtures priced")
     return panel
+
+
+def publish(now: pd.Timestamp) -> pathlib.Path | None:
+    """Refresh the file the report reads, whether or not anything new was asked."""
+    published = published_snapshot(load_records(), now)
+    if not published:
+        return None
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    path = RESULTS_DIR / "panel_latest.json"
+    path.write_text(json.dumps(published, indent=2))
+    print(f"Published {len(published['fixtures'])} fixtures for the report in {path}")
+    return path
 
 
 def score() -> dict:
@@ -83,6 +92,7 @@ def score() -> dict:
 def run(now: pd.Timestamp | None = None) -> dict:
     now = now or league_now()
     panel = ask(now)
+    publish(now)
     return {"asked": len(panel), "scores": score()}
 
 

@@ -1,4 +1,5 @@
 import json
+import re
 
 import pytest
 
@@ -177,3 +178,58 @@ def test_the_page_shows_what_betting_the_model_anyway_would_have_cost(results):
     assert "6.0%" in page
     assert "Bankroll, model only" in page
     assert "started at 1000" in page
+
+
+def stamp(page):
+    found = re.search(r"<!-- fingerprint ([0-9a-f]{12}) -->", page)
+    return found.group(1) if found else None
+
+
+def test_the_page_carries_a_fingerprint_of_its_contents(results):
+    write(results, "matchweek_20260912.json", MATCHWEEK)
+    assert stamp(build_report.build()) is not None
+
+
+def test_the_same_results_fingerprint_the_same(results):
+    write(results, "matchweek_20260912.json", MATCHWEEK)
+    assert stamp(build_report.build()) == stamp(build_report.build())
+
+
+def test_a_changed_number_changes_the_fingerprint(results):
+    write(results, "matchweek_20260912.json", MATCHWEEK)
+    before = stamp(build_report.build())
+    moved = {**MATCHWEEK, "fixtures": [{**MATCHWEEK["fixtures"][0], "p_home": 0.6, "p_away": 0.1}]}
+    write(results, "matchweek_20260912.json", moved)
+    assert stamp(build_report.build()) != before
+
+
+SIGNIFICANT = {
+    **BACKTEST,
+    "significance": {
+        "market_closing_vs_dixon_coles": {
+            "mean": 0.00761, "low": 0.00392, "high": 0.01137, "better_share": 1.0,
+        },
+        "dixon_coles_xg_vs_dixon_coles": {
+            "mean": 0.00026, "low": -0.00347, "high": 0.00393, "better_share": 0.55,
+        },
+    },
+}
+
+
+def test_nothing_is_said_about_significance_before_it_is_measured(results):
+    write(results, "backtest.json", BACKTEST)
+    assert "crosses zero" not in build_report.build()
+
+
+def test_a_gap_that_survives_resampling_is_reported_as_holding(results):
+    write(results, "backtest.json", SIGNIFICANT)
+    page = build_report.build()
+    assert "market closing over dixon coles" in page
+    assert "+0.00392" in page
+
+
+def test_a_gap_that_does_not_survive_is_called_out_as_crossing_zero(results):
+    write(results, "backtest.json", SIGNIFICANT)
+    page = build_report.build()
+    assert "crosses zero" in page
+    assert "-0.00347" in page
