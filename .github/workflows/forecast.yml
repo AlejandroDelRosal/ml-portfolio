@@ -37,10 +37,14 @@ jobs:
       - name: Restore the panel archive
         # The archive is the experiment's record: without it the guard cannot
         # tell a new fixture from one already priced, and nothing can be scored.
+        # Only the archive is restored. The studies are versioned on main and main
+        # is the authority; taking the whole results directory from the branch
+        # would overwrite them with an older copy, and the report would then be
+        # built from numbers that are no longer in the repository.
         run: |
           git fetch origin "$RESULTS_BRANCH" 2>/dev/null || true
           if git rev-parse --verify "origin/$RESULTS_BRANCH" >/dev/null 2>&1; then
-            git checkout "origin/$RESULTS_BRANCH" -- "$PROJECT/results" || true
+            git checkout "origin/$RESULTS_BRANCH" -- "$PROJECT/results/llm_panel" || true
             git reset -q
             echo "Restored $(find "$PROJECT/results/llm_panel" -name 'panel_*.csv' 2>/dev/null | wc -l) panel files"
           else
