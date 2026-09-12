@@ -98,6 +98,25 @@ def test_fixtures_keep_only_the_requested_competition():
     assert set(load_fixtures(UPCOMING)["Div"]) == {"E0"}
 
 
+def test_the_clock_used_for_kick_offs_runs_on_england_time():
+    from src.loader import LEAGUE_TIMEZONE, league_now
+
+    now = league_now()
+    expected = pd.Timestamp.now(tz=LEAGUE_TIMEZONE).tz_localize(None)
+    assert now.tzinfo is None
+    assert abs((now - expected).total_seconds()) < 5
+
+
+def test_a_machine_in_another_timezone_does_not_see_started_matches_as_upcoming():
+    from analysis.predict_next import upcoming
+    from src.loader import league_now
+
+    kicked_off = league_now() - pd.Timedelta(hours=1)
+    ahead = league_now() + pd.Timedelta(hours=1)
+    fixtures = pd.DataFrame({"Datetime": [kicked_off, ahead]})
+    assert len(upcoming(fixtures, league_now())) == 1
+
+
 def test_fixtures_are_chronological_and_dated():
     upcoming = load_fixtures(UPCOMING)
     assert upcoming["Datetime"].is_monotonic_increasing

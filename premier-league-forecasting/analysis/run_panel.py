@@ -10,7 +10,7 @@ import pathlib
 import pandas as pd
 
 from src.llm_panel import PANEL_SIZE, free_models, load_records, record, run_panel
-from src.loader import load_fixtures, load_matches
+from src.loader import league_now, load_fixtures, load_matches
 from src.market import MarketPredictor, OPENING_ODDS
 from src.metrics import compare, evaluate
 from src.models import OUTCOME_COLUMNS
@@ -73,7 +73,7 @@ def score() -> dict:
 
 
 def run(now: pd.Timestamp | None = None) -> dict:
-    now = now or pd.Timestamp.now()
+    now = now or league_now()
     panel = ask(now)
     return {"asked": len(panel), "scores": score()}
 

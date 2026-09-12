@@ -26,6 +26,9 @@ CANONICAL_COLUMNS = MATCH_COLUMNS + STAT_COLUMNS + XG_COLUMNS + ODDS_COLUMNS
 
 FIXTURES_PATH = RAW_DIR / "fixtures.csv"
 COMPETITION = "E0"
+# Kick-off times are published in England's local time, so anything comparing a
+# clock against them has to be in that clock, not the machine's.
+LEAGUE_TIMEZONE = "Europe/London"
 # Seasons run August to May, so a January match belongs to the year before it.
 SEASON_START_MONTH = 7
 
@@ -33,6 +36,10 @@ SEASON_START_MONTH = 7
 def season_label(path: pathlib.Path) -> str:
     code = path.stem.split("_")[1]
     return f"20{code[:2]}-{code[2:]}"
+
+
+def league_now() -> pd.Timestamp:
+    return pd.Timestamp.now(tz=LEAGUE_TIMEZONE).tz_localize(None)
 
 
 def season_from_date(moment: pd.Timestamp) -> str:

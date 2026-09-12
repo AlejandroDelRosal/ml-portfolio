@@ -11,7 +11,7 @@ import pathlib
 import pandas as pd
 
 from src.betting import DEFAULT_KELLY_FRACTION, DEFAULT_MIN_EDGE, DEFAULT_STAKE_CAP, blend, selection_frame, value_bets
-from src.loader import load_fixtures, load_matches
+from src.loader import league_now, load_fixtures, load_matches
 from src.market import OPENING_ODDS, MarketPredictor
 from src.models import DEFAULT_XI, OUTCOME_COLUMNS, GoalModel
 
@@ -39,7 +39,7 @@ def upcoming(fixtures: pd.DataFrame, now: pd.Timestamp) -> pd.DataFrame:
 
 
 def run(now: pd.Timestamp | None = None) -> dict:
-    now = now or pd.Timestamp.now()
+    now = now or league_now()
     chosen = settings()
     history = load_matches()
     fixtures = upcoming(load_fixtures(), now)
