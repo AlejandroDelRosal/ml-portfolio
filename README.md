@@ -6,6 +6,7 @@ A collection of machine learning models, growing over time with new examples: fr
 
 - [`autograd-engine/`](autograd-engine/): reverse-mode automatic differentiation and a neural network library written from scratch on NumPy, matching PyTorch's training loss to 5.55e-17
 - [`time-series-forecasting/`](time-series-forecasting/): naive, seasonal naive, Holt-Winters, and ARIMA forecasts on real US unemployment data, compared with the Diebold-Mariano statistical test
+- [`premier-league-forecasting/`](premier-league-forecasting/): Poisson family goal models, Elo and pi-ratings forecasting Premier League matches, scored against the bookmakers' closing line in a walk-forward backtest with no look-ahead
 - `credit-risk-scoring/`: ML pipeline for loan default prediction (Random Forest, class weighting for imbalanced datasets, feature importance for regulatory explainability)
 - `software-foundations/`: supporting software engineering work
   - `geometry_toolkit.py`: object-oriented 2D/3D geometry engine (inheritance, vector calculus)
