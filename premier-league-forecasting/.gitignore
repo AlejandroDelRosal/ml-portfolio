@@ -1,0 +1,9 @@
+# Rewritten every matchweek by the fetch script; the season files stay versioned
+# because the reported numbers are computed from them.
+data/raw/fixtures.csv
+
+results/*.log
+results/report.html
+results/matchweek_*.json
+results/predictions_*.csv
+results/llm_panel/
