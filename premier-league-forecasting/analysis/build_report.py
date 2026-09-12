@@ -185,6 +185,7 @@ PAGE = Template("""<title>Closing Line Report</title>
     <div class="scroll">$matchweek</div>
   </section>
 
+$panel
   <section>
     <h2>Walk-forward standings</h2>
     <p class="lede">$standings_note</p>
@@ -249,6 +250,57 @@ def matchweek_table(matchweek: dict) -> str:
     return f"<table><thead>{header}</thead><tbody>{''.join(rows)}</tbody></table>"
 
 
+def panel_section(panel: dict, scores: dict) -> str:
+    """The language model panel, absent entirely until a model has been asked."""
+    fixtures = panel.get("fixtures", [])
+    if not fixtures:
+        return ""
+    rows = []
+    for fixture in fixtures:
+        kickoff = str(fixture.get("kickoff", ""))[:16].replace("T", " ")
+        match = f"{fixture['home']} v {fixture['away']}"
+        for model, probabilities in fixture.get("forecasts", {}).items():
+            rows.append(
+                f'<tr><td>{html.escape(kickoff)}</td><td>{html.escape(match)}</td>'
+                f'<td>{html.escape(model)}</td>'
+                f'<td class="split">{bar(probabilities)}</td>'
+                + "".join(f'<td class="num">{value:.0%}</td>' for value in probabilities)
+                + "</tr>"
+            )
+    header = "<tr><th>Kick-off</th><th>Match</th><th>Model</th><th>Forecast</th><th>H</th><th>D</th><th>A</th></tr>"
+    asked = str(panel.get("asked_at", ""))[:16].replace("T", " ")
+    return f"""
+  <section>
+    <h2>What the language models said</h2>
+    <p class="lede">Free models on OpenRouter, asked {html.escape(asked)} and stored before the first kick-off.
+    A model that already knows the result is not forecasting, so the recorder refuses anything asked later.</p>
+    <div class="scroll"><table><thead>{header}</thead><tbody>{''.join(rows)}</tbody></table></div>
+    <h2>Panel scored so far</h2>
+    <div class="scroll">{panel_standings(scores)}</div>
+  </section>
+"""
+
+
+def panel_standings(scores: dict) -> str:
+    if not scores:
+        return '<p class="lede">The fixtures on file have not been played yet, so there is nothing to score.</p>'
+    ordered = sorted(scores.items(), key=lambda item: item[1]["rps"])
+    market = scores.get("market_opening", {}).get("rps")
+    rows = []
+    for name, entry in ordered:
+        gap = "" if market is None else f"{entry['rps'] - market:+.5f}"
+        klass = ' class="market-row"' if name.startswith("market") else ""
+        rows.append(
+            f"<tr{klass}><td>{html.escape(name.replace('_', ' '))}</td>"
+            f'<td class="num">{entry["n"]}</td>'
+            f'<td class="num">{entry["rps"]:.5f}</td>'
+            f'<td class="num">{gap}</td>'
+            f'<td class="num">{entry["accuracy"]:.1%}</td></tr>'
+        )
+    header = "<tr><th>Forecaster</th><th>Forecasts</th><th>RPS</th><th>vs market</th><th>Top pick</th></tr>"
+    return f'<table class="leader"><thead>{header}</thead><tbody>{"".join(rows)}</tbody></table>'
+
+
 def standings_table(backtest: dict) -> str:
     results = backtest.get("results", {})
     if not results:
@@ -307,6 +359,7 @@ def calibration_chart(baseline: dict) -> str:
 def build() -> str:
     baseline, backtest, betting = read_json("baseline.json"), read_json("backtest.json"), read_json("betting.json")
     matchweek = latest_matchweek()
+    panel, panel_scores = read_json("panel_latest.json"), read_json("llm_panel_scores.json")
     settings = matchweek.get("settings", {})
 
     book = betting.get("books", {}).get("opening", {})
@@ -340,6 +393,14 @@ def build() -> str:
             f'<span class="{"delta-good" if diagnostic["roi"] > 0 else "delta-bad"}">{diagnostic["roi"]:.1%}</span>',
             f"{diagnostic['bets']} bets, 95% [{diagnostic['ci_low']:.0%}, {diagnostic['ci_high']:.0%}]",
         ))
+    if diagnostic.get("positive_share") is not None:
+        tiles.append(tile("Resamples in profit", f"{diagnostic['positive_share']:.1%}", "10,000 bootstrap runs"))
+    if diagnostic.get("final_bankroll") is not None:
+        tiles.append(tile(
+            "Bankroll, model only",
+            f'<span class="delta-bad">{diagnostic["final_bankroll"]:.0f}</span>',
+            f"started at 1000, worst drawdown {diagnostic.get('max_drawdown', 0):.0%}",
+        ))
     if baseline.get("closing_margin_mean"):
         tiles.append(tile("Bookmaker margin", f"{baseline['closing_margin_mean']:.2%}", "closing line overround"))
     if not tiles:
@@ -356,6 +417,7 @@ def build() -> str:
         verdict_class="is-positive" if demonstrable else "",
         tiles="".join(tiles),
         matchweek=matchweek_table(matchweek),
+        panel=panel_section(panel, panel_scores),
         standings=standings_table(backtest),
         standings_note=(
             f"Walk-forward over {', '.join(backtest.get('test_seasons', []))}, {backtest.get('matches', 0)} matches, "

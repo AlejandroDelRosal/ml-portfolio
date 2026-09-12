@@ -14,13 +14,15 @@ import numpy as np
 import pandas as pd
 import requests
 
-from src.models import PROBABILITY_COLUMNS
+from src.models import OUTCOME_COLUMNS, PROBABILITY_COLUMNS
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1"
 API_KEY_VARIABLE = "OPENROUTER_API_KEY"
 PANEL_SIZE = 6
 REQUEST_TIMEOUT = 180
 PANEL_DIR = pathlib.Path(__file__).parent.parent / "results" / "llm_panel"
+# A fixture is the pairing at a kick-off: the same teams rescheduled is a new one.
+FIXTURE_KEY = ["HomeTeam", "AwayTeam", "Datetime"]
 
 PROMPT = """You are forecasting English Premier League matches.
 
@@ -150,9 +152,40 @@ def record(panel: dict, fixtures: pd.DataFrame, asked_at: pd.Timestamp, director
     return path
 
 
+def snapshot(panel: dict, fixtures: pd.DataFrame, asked_at: pd.Timestamp) -> dict:
+    """A JSON-shaped view of the panel, so the report stays free of pandas."""
+    rows = []
+    for position in range(len(fixtures)):
+        fixture = fixtures.iloc[position]
+        forecasts = {}
+        for model, predictions in panel.items():
+            values = predictions.iloc[position][OUTCOME_COLUMNS]
+            # A model that skipped a fixture is absent rather than present and empty.
+            if values.notna().all():
+                forecasts[model] = [float(value) for value in values]
+        rows.append({
+            "kickoff": fixture["Datetime"].isoformat(),
+            "home": str(fixture["HomeTeam"]),
+            "away": str(fixture["AwayTeam"]),
+            "forecasts": forecasts,
+        })
+    return {"asked_at": asked_at.isoformat(), "models": list(panel), "fixtures": rows}
+
+
+def unasked(fixtures: pd.DataFrame, records: pd.DataFrame) -> pd.DataFrame:
+    """Fixtures with no forecast on file, so running twice never asks twice."""
+    if records.empty:
+        return fixtures
+    already = pd.MultiIndex.from_frame(records[FIXTURE_KEY])
+    current = pd.MultiIndex.from_frame(fixtures[FIXTURE_KEY])
+    return fixtures[~current.isin(already)]
+
+
 def load_records(directory: pathlib.Path = PANEL_DIR) -> pd.DataFrame:
     paths = sorted(directory.glob("panel_*.csv"))
     if not paths:
         return pd.DataFrame(columns=["model", "asked_at", "Datetime", "HomeTeam", "AwayTeam"] + PROBABILITY_COLUMNS)
     frames = [pd.read_csv(path, parse_dates=["asked_at", "Datetime"]) for path in paths]
-    return pd.concat(frames, ignore_index=True)
+    records = pd.concat(frames, ignore_index=True).sort_values("asked_at", kind="mergesort")
+    # A fixture asked more than once counts once, at the earliest asking.
+    return records.drop_duplicates(subset=["model"] + FIXTURE_KEY, keep="first").reset_index(drop=True)

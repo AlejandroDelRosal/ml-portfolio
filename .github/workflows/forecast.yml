@@ -1,0 +1,104 @@
+name: Premier League forecast
+
+# The panel must be asked before kick-off, and the fixture file is a rolling
+# window, so this runs daily rather than weekly: a midweek round would fall in
+# the gap between two weekly runs and never be forecast. Asking twice about the
+# same fixture is prevented in code, not by the schedule.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: forecast
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  PROJECT: premier-league-forecasting
+  RESULTS_BRANCH: results
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r "$PROJECT/requirements.txt"
+
+      - name: Restore the panel archive
+        # The archive is the experiment's record: without it the guard cannot
+        # tell a new fixture from one already priced, and nothing can be scored.
+        run: |
+          git fetch origin "$RESULTS_BRANCH" 2>/dev/null || true
+          if git rev-parse --verify "origin/$RESULTS_BRANCH" >/dev/null 2>&1; then
+            git checkout "origin/$RESULTS_BRANCH" -- "$PROJECT/results" || true
+            git reset -q
+            echo "Restored $(find "$PROJECT/results/llm_panel" -name 'panel_*.csv' 2>/dev/null | wc -l) panel files"
+          else
+            echo "No results branch yet; this is the first run"
+          fi
+
+      - name: Refresh results and prices
+        working-directory: ${{ env.PROJECT }}
+        run: python -m data.fetch_football_data
+
+      - name: Forecast the coming matchweek
+        working-directory: ${{ env.PROJECT }}
+        run: python -m analysis.predict_next
+
+      - name: Ask the model panel
+        working-directory: ${{ env.PROJECT }}
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          if [ -n "${OPENROUTER_API_KEY:-}" ]; then
+            python -m analysis.run_panel
+          else
+            echo "OPENROUTER_API_KEY not set, skipping the model panel"
+          fi
+
+      - name: Build the report
+        working-directory: ${{ env.PROJECT }}
+        run: python -m analysis.build_report
+
+      - name: Publish to the results branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          staging="$RUNNER_TEMP/staging"
+          rm -rf "$staging"
+          cp -r "$PROJECT/results" "$staging"
+
+          publish="$RUNNER_TEMP/publish"
+          rm -rf "$publish"
+          git worktree add --detach "$publish"
+          cd "$publish"
+          if git rev-parse --verify "origin/$RESULTS_BRANCH" >/dev/null 2>&1; then
+            git checkout -B "$RESULTS_BRANCH" "origin/$RESULTS_BRANCH"
+          else
+            git checkout --orphan "$RESULTS_BRANCH"
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+
+          rm -rf "$PROJECT/results"
+          mkdir -p "$PROJECT/results"
+          cp -r "$staging/." "$PROJECT/results/"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing changed; the branch already holds this forecast"
+            exit 0
+          fi
+          git commit -m "results: $(date -u +%Y-%m-%d)"
+          git push origin "$RESULTS_BRANCH"

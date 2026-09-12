@@ -9,7 +9,7 @@ import pathlib
 
 import pandas as pd
 
-from src.llm_panel import PANEL_SIZE, free_models, load_records, record, run_panel
+from src.llm_panel import PANEL_SIZE, free_models, load_records, record, run_panel, snapshot, unasked
 from src.loader import league_now, load_fixtures, load_matches
 from src.market import MarketPredictor, OPENING_ODDS
 from src.metrics import compare, evaluate
@@ -25,6 +25,11 @@ def ask(now: pd.Timestamp) -> dict:
     if fixtures.empty:
         print("No fixture ahead; the panel has nothing to forecast.")
         return {}
+    # The routine runs daily, so most days every fixture ahead was already priced.
+    fixtures = unasked(fixtures, load_records())
+    if fixtures.empty:
+        print("Every fixture ahead already has a forecast on file.")
+        return {}
     models = free_models(limit=PANEL_SIZE)
     print(f"Asking {len(models)} free models about {len(fixtures)} fixtures:")
     for model in models:
@@ -34,6 +39,9 @@ def ask(now: pd.Timestamp) -> dict:
         print("No model answered usably.")
         return {}
     path = record(panel, fixtures, asked_at=now)
+    # The report reads JSON only, so the panel is published in a shape it can use.
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    (RESULTS_DIR / "panel_latest.json").write_text(json.dumps(snapshot(panel, fixtures, now), indent=2))
     print(f"\nRecorded {len(panel)} model answers in {path}")
     for model, predictions in panel.items():
         answered = predictions[OUTCOME_COLUMNS].notna().all(axis=1).sum()
