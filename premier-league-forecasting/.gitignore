@@ -7,3 +7,4 @@ results/report.html
 results/matchweek_*.json
 results/predictions_*.csv
 results/llm_panel/
+results/panel_latest.json

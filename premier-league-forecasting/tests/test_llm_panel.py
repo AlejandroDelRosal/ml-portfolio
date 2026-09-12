@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from src import llm_panel
 from src.llm_panel import (
     PanelError,
     ask_model,
@@ -165,3 +166,58 @@ def test_a_recorded_panel_round_trips(tmp_path):
 
 def test_an_empty_archive_still_has_the_right_shape(tmp_path):
     assert list(load_records(tmp_path).columns)[:2] == ["model", "asked_at"]
+
+
+def store(directory, asked_at, fixtures=None):
+    fixtures = FIXTURES.head(1) if fixtures is None else fixtures
+    text = reply([{"home": "Arsenal", "away": "Chelsea", "p_home": 0.5, "p_draw": 0.25, "p_away": 0.25}])
+    record({"a:free": parse_response(text, fixtures)}, fixtures, asked_at=asked_at, directory=directory)
+
+
+def test_every_fixture_is_asked_when_nothing_has_been_recorded(tmp_path):
+    assert len(llm_panel.unasked(FIXTURES, load_records(tmp_path))) == len(FIXTURES)
+
+
+def test_a_fixture_already_recorded_is_not_asked_again(tmp_path):
+    store(tmp_path, pd.Timestamp("2026-09-18 09:00"))
+    assert list(llm_panel.unasked(FIXTURES, load_records(tmp_path))["HomeTeam"]) == ["Hull"]
+
+
+def test_the_same_teams_at_a_different_kick_off_are_a_new_fixture(tmp_path):
+    store(tmp_path, pd.Timestamp("2026-09-18 09:00"))
+    rescheduled = FIXTURES.head(1).assign(Datetime=[pd.Timestamp("2026-10-01 19:45")])
+    assert len(llm_panel.unasked(rescheduled, load_records(tmp_path))) == 1
+
+
+def test_the_same_fixture_recorded_twice_is_kept_once_at_the_earliest_asking(tmp_path):
+    store(tmp_path, pd.Timestamp("2026-09-18 09:00"))
+    store(tmp_path, pd.Timestamp("2026-09-17 09:00"))
+    stored = load_records(tmp_path)
+    assert len(stored) == 1
+    assert stored["asked_at"].item() == pd.Timestamp("2026-09-17 09:00")
+
+
+def two_model_panel():
+    first = reply([
+        {"home": "Arsenal", "away": "Chelsea", "p_home": 0.5, "p_draw": 0.25, "p_away": 0.25},
+        {"home": "Hull", "away": "Man United", "p_home": 0.2, "p_draw": 0.3, "p_away": 0.5},
+    ])
+    second = reply([{"home": "Arsenal", "away": "Chelsea", "p_home": 0.4, "p_draw": 0.3, "p_away": 0.3}])
+    return {"a:free": parse_response(first, FIXTURES), "b:free": parse_response(second, FIXTURES)}
+
+
+def test_a_snapshot_carries_each_model_answer_per_fixture():
+    snapshot = llm_panel.snapshot(two_model_panel(), FIXTURES, asked_at=pd.Timestamp("2026-09-18 09:00"))
+    assert snapshot["models"] == ["a:free", "b:free"]
+    assert [row["home"] for row in snapshot["fixtures"]] == ["Arsenal", "Hull"]
+    assert snapshot["fixtures"][0]["forecasts"]["a:free"] == pytest.approx([0.5, 0.25, 0.25])
+
+
+def test_a_snapshot_omits_a_fixture_a_model_did_not_price():
+    snapshot = llm_panel.snapshot(two_model_panel(), FIXTURES, asked_at=pd.Timestamp("2026-09-18 09:00"))
+    assert "b:free" not in snapshot["fixtures"][1]["forecasts"]
+
+
+def test_a_snapshot_is_json_serialisable():
+    snapshot = llm_panel.snapshot(two_model_panel(), FIXTURES, asked_at=pd.Timestamp("2026-09-18 09:00"))
+    assert json.loads(json.dumps(snapshot))["asked_at"].startswith("2026-09-18")
