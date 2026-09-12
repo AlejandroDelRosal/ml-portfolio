@@ -171,3 +171,13 @@ def test_significance_reports_an_interval_that_can_cross_zero():
     predictions = {"market_closing": even, "model": even.copy()}
     found = run_backtest.significance(predictions, even.index, [("market_closing", "model")], draws=100)
     assert found["market_closing_vs_model"]["low"] == 0.0
+
+
+def test_the_workflow_restores_only_the_panel_archive():
+    # The studies are versioned on main and main is the authority. Restoring the
+    # whole results directory from the branch overwrites them with an older copy,
+    # and the report is then built from numbers no longer in the repository.
+    restored = re.findall(r'git checkout "origin/\$RESULTS_BRANCH" -- "([^"]+)"', WORKFLOW.read_text())
+    assert restored
+    for path in restored:
+        assert path.endswith("results/llm_panel"), path
