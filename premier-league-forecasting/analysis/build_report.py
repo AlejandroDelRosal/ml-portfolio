@@ -332,12 +332,21 @@ def build() -> str:
             note = "" if gap is None else f"{gap:+.4f} vs market"
             tiles.append(tile(label, f'<span class="{"delta-good" if gap and gap < 0 else "delta-bad"}">{scores["rps"]:.4f}</span>', note))
     if book:
-        tiles.append(tile("Simulated ROI", f"{book['roi']:.1%}" if book.get("bets") else "no bets", f"{book.get('bets', 0)} bets into the opening line"))
+        tiles.append(tile("Value found", f"{book['bets']} bets" if book.get("bets") else "none", "selections clearing the edge threshold"))
+    diagnostic = betting.get("books", {}).get("model_only", {})
+    if diagnostic.get("bets"):
+        tiles.append(tile(
+            "Model alone, ROI",
+            f'<span class="{"delta-good" if diagnostic["roi"] > 0 else "delta-bad"}">{diagnostic["roi"]:.1%}</span>',
+            f"{diagnostic['bets']} bets, 95% [{diagnostic['ci_low']:.0%}, {diagnostic['ci_high']:.0%}]",
+        ))
     if baseline.get("closing_margin_mean"):
         tiles.append(tile("Bookmaker margin", f"{baseline['closing_margin_mean']:.2%}", "closing line overround"))
     if not tiles:
         tiles.append(tile("Status", "empty", "no results yet"))
 
+    # The studies are the authority on these; the matchweek file may predate them.
+    weights = betting.get("weights", {})
     return PAGE.substitute(
         season=matchweek.get("fixtures", [{}])[0].get("Season", "2026-27") if matchweek.get("fixtures") else "2026-27",
         generated=str(matchweek.get("generated_at", ""))[:10] or "pending",
@@ -355,8 +364,8 @@ def build() -> str:
         calibration=calibration_chart(baseline),
         matches=backtest.get("matches", baseline.get("matches", 0)),
         model=html.escape(str(settings.get("model", "Dixon-Coles"))),
-        xi=settings.get("xi", backtest.get("xi", "unset")),
-        weight=settings.get("weight", betting.get("weight", "unset")),
+        xi=backtest.get("xi", settings.get("xi", "unset")),
+        weight=weights.get("opening", betting.get("weight", settings.get("weight", "unset"))),
     )
 
 
