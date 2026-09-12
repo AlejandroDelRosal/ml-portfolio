@@ -1,0 +1,97 @@
+{
+  "xi": 0.003,
+  "weights": {
+    "opening": 0.0,
+    "closing": 0.0
+  },
+  "weight": 0.0,
+  "edges": {
+    "opening": 0.0,
+    "closing": 0.0,
+    "model_only": 0.02
+  },
+  "accuracy": {
+    "market_closing": {
+      "n": 1140,
+      "rps": 0.19375055952640644,
+      "log_loss": 0.9593849716062172,
+      "brier": 0.569875537094154,
+      "ignorance": 1.384099940839689,
+      "accuracy": 0.55
+    },
+    "market_opening": {
+      "n": 1140,
+      "rps": 0.19548573406993194,
+      "log_loss": 0.9648021173907402,
+      "brier": 0.57414016808275,
+      "ignorance": 1.3919152301987923,
+      "accuracy": 0.5421052631578948
+    },
+    "model": {
+      "n": 1140,
+      "rps": 0.20162106899152168,
+      "log_loss": 0.9843695756239497,
+      "brier": 0.5869786865827467,
+      "ignorance": 1.4201451051546463,
+      "accuracy": 0.5175438596491229
+    },
+    "blend_opening": {
+      "n": 1140,
+      "rps": 0.19548573406993133,
+      "log_loss": 0.9648021173903178,
+      "brier": 0.5741401680827508,
+      "ignorance": 1.391915230198183,
+      "accuracy": 0.5421052631578948
+    },
+    "blend_closing": {
+      "n": 1140,
+      "rps": 0.19375055952640854,
+      "log_loss": 0.9593849716057684,
+      "brier": 0.569875537094156,
+      "ignorance": 1.38409994083904,
+      "accuracy": 0.55
+    }
+  },
+  "books": {
+    "opening": {
+      "bets": 0,
+      "staked": 0.0,
+      "profit": 0.0,
+      "roi": NaN,
+      "final_bankroll": 1000.0,
+      "max_drawdown": 0.0,
+      "ci_low": NaN,
+      "ci_high": NaN,
+      "positive_share": NaN,
+      "demonstrable_edge": false,
+      "min_edge": 0.0
+    },
+    "closing": {
+      "bets": 0,
+      "staked": 0.0,
+      "profit": 0.0,
+      "roi": NaN,
+      "final_bankroll": 1000.0,
+      "max_drawdown": 0.0,
+      "ci_low": NaN,
+      "ci_high": NaN,
+      "positive_share": NaN,
+      "demonstrable_edge": false,
+      "min_edge": 0.0
+    },
+    "model_only": {
+      "bets": 1106,
+      "staked": 8474.2483428493,
+      "profit": -801.7582706507667,
+      "roi": -0.09461113696618327,
+      "final_bankroll": 198.24172934923257,
+      "max_drawdown": 0.8803912527919594,
+      "ci_low": -0.21309806956039606,
+      "ci_high": 0.02535695127026211,
+      "positive_share": 0.0601,
+      "demonstrable_edge": false,
+      "min_edge": 0.02
+    }
+  },
+  "matches": 1140
+}

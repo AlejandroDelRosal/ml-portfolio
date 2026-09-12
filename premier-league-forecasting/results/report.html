@@ -1,0 +1,199 @@
+<title>Closing Line Report</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #f6f7f4;
+    --surface: #ffffff;
+    --edge: #d8dcd4;
+    --ink: #14170f;
+    --muted: #5d6356;
+    --accent: #0e6b63;
+    --accent-soft: #d7e8e5;
+    --good: #2f8f5b;
+    --warn: #b7791f;
+    --critical: #b3402f;
+    --home: #0e6b63;
+    --draw: #9aa392;
+    --away: #b3402f;
+  }
+  :root:not([data-theme="light"]) {
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #101310;
+      --surface: #181c17;
+      --edge: #2b3129;
+      --ink: #edefea;
+      --muted: #9aa392;
+      --accent: #4fbfae;
+      --accent-soft: #1d3330;
+      --good: #5cc189;
+      --warn: #d9a441;
+      --critical: #e0705c;
+      --home: #4fbfae;
+      --draw: #7d8878;
+      --away: #e0705c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #101310;
+    --surface: #181c17;
+    --edge: #2b3129;
+    --ink: #edefea;
+    --muted: #9aa392;
+    --accent: #4fbfae;
+    --accent-soft: #1d3330;
+    --good: #5cc189;
+    --warn: #d9a441;
+    --critical: #e0705c;
+    --home: #4fbfae;
+    --draw: #7d8878;
+    --away: #e0705c;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding-block: 40px 72px;
+    padding-left: 20px;
+    padding-right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  h1, h2 {
+    font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    text-wrap: balance;
+    margin: 0;
+  }
+  h1 { font-size: clamp(2rem, 5vw, 2.9rem); font-weight: 800; letter-spacing: -0.02em; }
+  h2 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+  p { margin: 0; max-width: 66ch; }
+  .lede { color: var(--muted); }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  section { display: flex; flex-direction: column; gap: 16px; }
+
+  .verdict {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 16px;
+    padding: 20px 24px;
+    border-left: 4px solid var(--critical);
+    background: var(--surface);
+  }
+  .verdict.is-positive { border-left-color: var(--good); }
+  .verdict strong { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.35rem; }
+  .verdict .detail { color: var(--muted); font-size: 0.95rem; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--edge); border: 1px solid var(--edge); }
+  .tile { background: var(--surface); padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+  .tile .value { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; font-size: 1.5rem; font-weight: 500; }
+  .tile .note { font-size: 0.8rem; color: var(--muted); }
+  .delta-good { color: var(--good); }
+  .delta-bad { color: var(--critical); }
+
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--edge); white-space: nowrap; }
+  th { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  td.num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; text-align: right; }
+  tbody tr:last-child td { border-bottom: none; }
+  .leader td:first-child { font-weight: 600; }
+  .market-row { background: var(--accent-soft); }
+
+  .split { width: 190px; }
+  .bar { display: flex; height: 9px; overflow: hidden; }
+  .bar span { display: block; height: 100%; }
+  .bar .h { background: var(--home); }
+  .bar .d { background: var(--draw); }
+  .bar .a { background: var(--away); }
+  .ghost { display: flex; height: 3px; margin-top: 2px; opacity: 0.45; }
+  .ghost span { display: block; height: 100%; }
+  .ghost .h { background: var(--home); }
+  .ghost .d { background: var(--draw); }
+  .ghost .a { background: var(--away); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.8rem; color: var(--muted); }
+  .swatch { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: middle; }
+
+  .chart { background: var(--surface); border: 1px solid var(--edge); padding: 16px; }
+  svg { display: block; width: 100%; height: auto; max-width: 100%; }
+  .axis { stroke: var(--edge); stroke-width: 1; fill: none; }
+  .ideal { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; fill: none; }
+  .tick { fill: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 10px; }
+  .point { fill: var(--accent); }
+  .trace { stroke: var(--accent); stroke-width: 2; fill: none; }
+
+  footer { color: var(--muted); font-size: 0.82rem; border-top: 1px solid var(--edge); padding-top: 16px; }
+  code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; }
+  @media (max-width: 560px) { .split { width: 130px; } }
+</style>
+
+<div class="page">
+  <header>
+    <p class="eyebrow">Premier League 2026-27 &middot; built 2026-09-12</p>
+    <h1>Closing Line Report</h1>
+    <p class="lede">Every forecast here is scored against the bookmakers' closing price, the hardest benchmark in football. A forecast that cannot beat that price is not a signal, and the page says so.</p>
+  </header>
+
+  <div class="verdict ">
+    <strong>No demonstrable edge</strong>
+    <span class="detail">The confidence interval on ROI crosses zero, so stakes stay at zero and these forecasts are information, not advice.</span>
+  </div>
+
+  <section>
+    <p class="eyebrow">Where the system stands</p>
+    <div class="tiles"><div class="tile"><span class="eyebrow">Market RPS</span><span class="value">0.1938</span><span class="note">the bar to beat</span></div><div class="tile"><span class="eyebrow">Model RPS</span><span class="value"><span class="delta-bad">0.2016</span></span><span class="note">+0.0079 vs market</span></div><div class="tile"><span class="eyebrow">Value found</span><span class="value">none</span><span class="note">selections clearing the edge threshold</span></div><div class="tile"><span class="eyebrow">Model alone, ROI</span><span class="value"><span class="delta-bad">-9.5%</span></span><span class="note">1106 bets, 95% [-21%, 3%]</span></div><div class="tile"><span class="eyebrow">Resamples in profit</span><span class="value">6.0%</span><span class="note">10,000 bootstrap runs</span></div><div class="tile"><span class="eyebrow">Bankroll, model only</span><span class="value"><span class="delta-bad">198</span></span><span class="note">started at 1000, worst drawdown 88%</span></div><div class="tile"><span class="eyebrow">Bookmaker margin</span><span class="value">4.30%</span><span class="note">closing line overround</span></div></div>
+  </section>
+
+  <section>
+    <h2>This matchweek</h2>
+    <p class="lede">The blended forecast, with the market's implied split as the thin line underneath each bar.</p>
+    <div class="legend">
+      <span><i class="swatch" style="background: var(--home)"></i>Home</span>
+      <span><i class="swatch" style="background: var(--draw)"></i>Draw</span>
+      <span><i class="swatch" style="background: var(--away)"></i>Away</span>
+    </div>
+    <div class="scroll"><table><thead><tr><th>Kick-off</th><th>Home</th><th>Away</th><th>Forecast</th><th>H</th><th>D</th><th>A</th></tr></thead><tbody><tr><td>2026-09-12 20:00</td><td>Sunderland</td><td>Arsenal</td><td class="split"><div class="bar"><span class="h" style="width: 11.82%"></span><span class="d" style="width: 22.31%"></span><span class="a" style="width: 65.87%"></span></div><div class="ghost"><span class="h" style="width: 11.82%"></span><span class="d" style="width: 22.31%"></span><span class="a" style="width: 65.87%"></span></div></td><td class="num">12%</td><td class="num">22%</td><td class="num">66%</td></tr><tr><td>2026-09-13 14:00</td><td>Coventry</td><td>Brighton</td><td class="split"><div class="bar"><span class="h" style="width: 23.58%"></span><span class="d" style="width: 24.80%"></span><span class="a" style="width: 51.62%"></span></div><div class="ghost"><span class="h" style="width: 23.58%"></span><span class="d" style="width: 24.80%"></span><span class="a" style="width: 51.62%"></span></div></td><td class="num">24%</td><td class="num">25%</td><td class="num">52%</td></tr><tr><td>2026-09-13 16:30</td><td>Man United</td><td>Man City</td><td class="split"><div class="bar"><span class="h" style="width: 30.33%"></span><span class="d" style="width: 24.42%"></span><span class="a" style="width: 45.25%"></span></div><div class="ghost"><span class="h" style="width: 30.33%"></span><span class="d" style="width: 24.42%"></span><span class="a" style="width: 45.25%"></span></div></td><td class="num">30%</td><td class="num">24%</td><td class="num">45%</td></tr><tr><td>2026-09-14 20:00</td><td>Leeds</td><td>Newcastle</td><td class="split"><div class="bar"><span class="h" style="width: 39.72%"></span><span class="d" style="width: 26.90%"></span><span class="a" style="width: 33.39%"></span></div><div class="ghost"><span class="h" style="width: 39.72%"></span><span class="d" style="width: 26.90%"></span><span class="a" style="width: 33.39%"></span></div></td><td class="num">40%</td><td class="num">27%</td><td class="num">33%</td></tr></tbody></table></div>
+  </section>
+
+
+  <section>
+    <h2>What the language models said</h2>
+    <p class="lede">Free models on OpenRouter, asked 2026-09-12 19:37 and stored before the first kick-off.
+    A model that already knows the result is not forecasting, so the recorder refuses anything asked later.</p>
+    <div class="scroll"><table><thead><tr><th>Kick-off</th><th>Match</th><th>Model</th><th>Forecast</th><th>H</th><th>D</th><th>A</th></tr></thead><tbody><tr><td>2026-09-12 20:00</td><td>Sunderland v Arsenal</td><td>nvidia/nemotron-3.5-lightning:free</td><td class="split"><div class="bar"><span class="h" style="width: 10.00%"></span><span class="d" style="width: 25.00%"></span><span class="a" style="width: 65.00%"></span></div></td><td class="num">10%</td><td class="num">25%</td><td class="num">65%</td></tr><tr><td>2026-09-12 20:00</td><td>Sunderland v Arsenal</td><td>nvidia/nemotron-3-ultra-550b-a55b:free</td><td class="split"><div class="bar"><span class="h" style="width: 12.00%"></span><span class="d" style="width: 23.00%"></span><span class="a" style="width: 65.00%"></span></div></td><td class="num">12%</td><td class="num">23%</td><td class="num">65%</td></tr><tr><td>2026-09-12 20:00</td><td>Sunderland v Arsenal</td><td>dots-studio/dots-3-note-preview:free</td><td class="split"><div class="bar"><span class="h" style="width: 15.00%"></span><span class="d" style="width: 25.00%"></span><span class="a" style="width: 60.00%"></span></div></td><td class="num">15%</td><td class="num">25%</td><td class="num">60%</td></tr><tr><td>2026-09-12 20:00</td><td>Sunderland v Arsenal</td><td>inclusionai/ling-3.0-flash-vl:free</td><td class="split"><div class="bar"><span class="h" style="width: 15.00%"></span><span class="d" style="width: 25.00%"></span><span class="a" style="width: 60.00%"></span></div></td><td class="num">15%</td><td class="num">25%</td><td class="num">60%</td></tr><tr><td>2026-09-13 14:00</td><td>Coventry v Brighton</td><td>nvidia/nemotron-3.5-lightning:free</td><td class="split"><div class="bar"><span class="h" style="width: 20.00%"></span><span class="d" style="width: 25.00%"></span><span class="a" style="width: 55.00%"></span></div></td><td class="num">20%</td><td class="num">25%</td><td class="num">55%</td></tr><tr><td>2026-09-13 14:00</td><td>Coventry v Brighton</td><td>nvidia/nemotron-3-ultra-550b-a55b:free</td><td class="split"><div class="bar"><span class="h" style="width: 18.00%"></span><span class="d" style="width: 25.00%"></span><span class="a" style="width: 57.00%"></span></div></td><td class="num">18%</td><td class="num">25%</td><td class="num">57%</td></tr><tr><td>2026-09-13 14:00</td><td>Coventry v Brighton</td><td>dots-studio/dots-3-note-preview:free</td><td class="split"><div class="bar"><span class="h" style="width: 35.00%"></span><span class="d" style="width: 25.00%"></span><span class="a" style="width: 40.00%"></span></div></td><td class="num">35%</td><td class="num">25%</td><td class="num">40%</td></tr><tr><td>2026-09-13 14:00</td><td>Coventry v Brighton</td><td>inclusionai/ling-3.0-flash-vl:free</td><td class="split"><div class="bar"><span class="h" style="width: 28.00%"></span><span class="d" style="width: 27.00%"></span><span class="a" style="width: 45.00%"></span></div></td><td class="num">28%</td><td class="num">27%</td><td class="num">45%</td></tr><tr><td>2026-09-13 16:30</td><td>Man United v Man City</td><td>nvidia/nemotron-3.5-lightning:free</td><td class="split"><div class="bar"><span class="h" style="width: 35.00%"></span><span class="d" style="width: 25.00%"></span><span class="a" style="width: 40.00%"></span></div></td><td class="num">35%</td><td class="num">25%</td><td class="num">40%</td></tr><tr><td>2026-09-13 16:30</td><td>Man United v Man City</td><td>nvidia/nemotron-3-ultra-550b-a55b:free</td><td class="split"><div class="bar"><span class="h" style="width: 27.00%"></span><span class="d" style="width: 28.00%"></span><span class="a" style="width: 45.00%"></span></div></td><td class="num">27%</td><td class="num">28%</td><td class="num">45%</td></tr><tr><td>2026-09-13 16:30</td><td>Man United v Man City</td><td>dots-studio/dots-3-note-preview:free</td><td class="split"><div class="bar"><span class="h" style="width: 30.00%"></span><span class="d" style="width: 25.00%"></span><span class="a" style="width: 45.00%"></span></div></td><td class="num">30%</td><td class="num">25%</td><td class="num">45%</td></tr><tr><td>2026-09-13 16:30</td><td>Man United v Man City</td><td>inclusionai/ling-3.0-flash-vl:free</td><td class="split"><div class="bar"><span class="h" style="width: 30.00%"></span><span class="d" style="width: 28.00%"></span><span class="a" style="width: 42.00%"></span></div></td><td class="num">30%</td><td class="num">28%</td><td class="num">42%</td></tr><tr><td>2026-09-14 20:00</td><td>Leeds v Newcastle</td><td>nvidia/nemotron-3.5-lightning:free</td><td class="split"><div class="bar"><span class="h" style="width: 30.00%"></span><span class="d" style="width: 27.00%"></span><span class="a" style="width: 43.00%"></span></div></td><td class="num">30%</td><td class="num">27%</td><td class="num">43%</td></tr><tr><td>2026-09-14 20:00</td><td>Leeds v Newcastle</td><td>nvidia/nemotron-3-ultra-550b-a55b:free</td><td class="split"><div class="bar"><span class="h" style="width: 20.00%"></span><span class="d" style="width: 24.00%"></span><span class="a" style="width: 56.00%"></span></div></td><td class="num">20%</td><td class="num">24%</td><td class="num">56%</td></tr><tr><td>2026-09-14 20:00</td><td>Leeds v Newcastle</td><td>dots-studio/dots-3-note-preview:free</td><td class="split"><div class="bar"><span class="h" style="width: 35.00%"></span><span class="d" style="width: 25.00%"></span><span class="a" style="width: 40.00%"></span></div></td><td class="num">35%</td><td class="num">25%</td><td class="num">40%</td></tr><tr><td>2026-09-14 20:00</td><td>Leeds v Newcastle</td><td>inclusionai/ling-3.0-flash-vl:free</td><td class="split"><div class="bar"><span class="h" style="width: 25.00%"></span><span class="d" style="width: 28.00%"></span><span class="a" style="width: 47.00%"></span></div></td><td class="num">25%</td><td class="num">28%</td><td class="num">47%</td></tr></tbody></table></div>
+    <h2>Panel scored so far</h2>
+    <div class="scroll"><p class="lede">The fixtures on file have not been played yet, so there is nothing to score.</p></div>
+  </section>
+
+  <section>
+    <h2>Walk-forward standings</h2>
+    <p class="lede">Walk-forward over 2023-24, 2024-25, 2025-26, 1140 matches, every forecaster judged on exactly the same fixtures.</p>
+    <div class="scroll"><table class="leader"><thead><tr><th>Forecaster</th><th>RPS</th><th>vs market</th><th>Log loss</th><th>Brier</th><th>Top pick</th></tr></thead><tbody><tr class="market-row"><td>market closing</td><td class="num">0.19375</td><td class="num">+0.00000</td><td class="num">0.95938</td><td class="num">0.56988</td><td class="num">55.0%</td></tr><tr><td>dixon coles</td><td class="num">0.20162</td><td class="num">+0.00787</td><td class="num">0.98437</td><td class="num">0.58698</td><td class="num">51.8%</td></tr><tr><td>poisson</td><td class="num">0.20170</td><td class="num">+0.00794</td><td class="num">0.98523</td><td class="num">0.58751</td><td class="num">51.8%</td></tr><tr><td>bivariate poisson</td><td class="num">0.20171</td><td class="num">+0.00796</td><td class="num">0.98493</td><td class="num">0.58743</td><td class="num">51.9%</td></tr><tr><td>elo</td><td class="num">0.20504</td><td class="num">+0.01129</td><td class="num">1.01088</td><td class="num">0.59918</td><td class="num">52.1%</td></tr><tr><td>pi ratings</td><td class="num">0.20974</td><td class="num">+0.01599</td><td class="num">1.04057</td><td class="num">0.60899</td><td class="num">48.9%</td></tr></tbody></table></div>
+  </section>
+
+  <section>
+    <h2>Is the closing line calibrated?</h2>
+    <p class="lede">Each point is a bucket of forecasts. On the dashed line, the market's stated probability matched how often those results actually happened.</p>
+    <div class="chart"><svg viewBox="0 0 376 368" role="img" aria-label="Calibration of the closing line"><rect x="46" y="16" width="300" height="300" class="axis"></rect><line class="ideal" x1="46.0" y1="316.0" x2="346.0" y2="16.0"></line><polyline class="trace" points="67.2,296.8 93.2,265.4 122.3,240.8 149.0,210.7 180.0,186.1 211.4,148.0 239.6,126.9 269.1,94.4 297.5,56.9 319.2,16.0"></polyline><circle class="point" cx="67.2" cy="296.8" r="4.7"></circle><circle class="point" cx="93.2" cy="265.4" r="6.4"></circle><circle class="point" cx="122.3" cy="240.8" r="8.0"></circle><circle class="point" cx="149.0" cy="210.7" r="6.0"></circle><circle class="point" cx="180.0" cy="186.1" r="5.6"></circle><circle class="point" cx="211.4" cy="148.0" r="5.3"></circle><circle class="point" cx="239.6" cy="126.9" r="4.9"></circle><circle class="point" cx="269.1" cy="94.4" r="4.5"></circle><circle class="point" cx="297.5" cy="56.9" r="4.0"></circle><circle class="point" cx="319.2" cy="16.0" r="3.2"></circle><text class="tick" x="38" y="320.0" text-anchor="end">0.00</text><text class="tick" x="46.0" y="336" text-anchor="middle">0.00</text><text class="tick" x="38" y="245.0" text-anchor="end">0.25</text><text class="tick" x="121.0" y="336" text-anchor="middle">0.25</text><text class="tick" x="38" y="170.0" text-anchor="end">0.50</text><text class="tick" x="196.0" y="336" text-anchor="middle">0.50</text><text class="tick" x="38" y="95.0" text-anchor="end">0.75</text><text class="tick" x="271.0" y="336" text-anchor="middle">0.75</text><text class="tick" x="38" y="20.0" text-anchor="end">1.00</text><text class="tick" x="346.0" y="336" text-anchor="middle">1.00</text><text class="tick" x="196" y="356" text-anchor="middle">Stated probability</text><text class="tick" x="14" y="166" text-anchor="middle" transform="rotate(-90 14 166)">Observed frequency</text></svg></div>
+  </section>
+
+  <footer>
+    <p>Sources: football-data.co.uk results and odds, 1140 matches. Model: Dixon-Coles with time decay xi=0.003, blended with the market at weight 0.0. Stakes are quarter Kelly, capped at 2% of bankroll, and held at zero until a backtest shows a positive lower bound on ROI.</p>
+  </footer>
+</div>

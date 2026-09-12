@@ -1,0 +1,119 @@
+{
+  "asked_at": "2026-09-12T19:37:40.988923",
+  "models": [
+    "nvidia/nemotron-3.5-lightning:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "dots-studio/dots-3-note-preview:free",
+    "inclusionai/ling-3.0-flash-vl:free"
+  ],
+  "fixtures": [
+    {
+      "kickoff": "2026-09-12T20:00:00",
+      "home": "Sunderland",
+      "away": "Arsenal",
+      "forecasts": {
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.1,
+          0.25,
+          0.65
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.12,
+          0.23,
+          0.65
+        ],
+        "dots-studio/dots-3-note-preview:free": [
+          0.15,
+          0.25,
+          0.6
+        ],
+        "inclusionai/ling-3.0-flash-vl:free": [
+          0.15,
+          0.25,
+          0.6
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-09-13T14:00:00",
+      "home": "Coventry",
+      "away": "Brighton",
+      "forecasts": {
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.2,
+          0.25,
+          0.55
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.18,
+          0.25,
+          0.57
+        ],
+        "dots-studio/dots-3-note-preview:free": [
+          0.35,
+          0.25,
+          0.4
+        ],
+        "inclusionai/ling-3.0-flash-vl:free": [
+          0.28,
+          0.27,
+          0.45
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-09-13T16:30:00",
+      "home": "Man United",
+      "away": "Man City",
+      "forecasts": {
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.35,
+          0.25,
+          0.4
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.27,
+          0.28,
+          0.45
+        ],
+        "dots-studio/dots-3-note-preview:free": [
+          0.3,
+          0.25,
+          0.45
+        ],
+        "inclusionai/ling-3.0-flash-vl:free": [
+          0.3,
+          0.28,
+          0.42
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-09-14T20:00:00",
+      "home": "Leeds",
+      "away": "Newcastle",
+      "forecasts": {
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.3,
+          0.27,
+          0.43
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.2,
+          0.24,
+          0.56
+        ],
+        "dots-studio/dots-3-note-preview:free": [
+          0.35,
+          0.25,
+          0.4
+        ],
+        "inclusionai/ling-3.0-flash-vl:free": [
+          0.25,
+          0.28,
+          0.47
+        ]
+      }
+    }
+  ]
+}
