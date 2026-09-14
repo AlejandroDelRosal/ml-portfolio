@@ -116,6 +116,40 @@ Quarter Kelly, stakes capped at 2% of bankroll, settled matchday by matchday, re
 
 An earlier version of this study tuned the blend, landed on weight zero, and then bet those probabilities into the opening price. It reported a 15.8% ROI with a 95% interval of [2.7%, 29.2%] and declared a demonstrable edge. That number is an artifact. With the weight at zero the forecast is the closing line, so the strategy amounted to betting the closing price into the opening price: a bet on line movement, placed with the movement already known. Each book now blends and settles against the same snapshot, so no book can see a price that would not exist yet when the bet is struck.
 
+### Letting a model see the price
+
+Pooling two forecasters at a weight chosen from a grid is a weak version of the question. The stronger one is to hand an optimiser the market and four models at once and let it decide what each is worth. `src/stacking.py` fits those weights by logarithmic pooling, walk-forward: the weights for a matchday come from earlier matchdays only, and the base forecasts were themselves produced walk-forward, so nothing sees its own match.
+
+Evaluated on the last 760 of the 1,140 test matches, the first 380 being spent on training the weights:
+
+| Recipe | RPS | Against the closing line |
+|---|---|---|
+| **Closing line, untouched** | **0.20043** | |
+| Closing price alone, reweighted | 0.20122 | indistinguishable |
+| Closing price + four models | 0.20125 | indistinguishable |
+| Opening price alone, reweighted | 0.20218 | worse, 95% [-0.00351, -0.00006] |
+| Opening price + four models | 0.20245 | worse, 95% [-0.00377, -0.00032] |
+| Four models, no price | 0.20534 | worse, 95% [-0.00840, -0.00135] |
+
+The weights say it plainly. Given the closing price and four models, the optimiser puts `1.0617` on the price and **exactly zero** on all four models. Given the opening price instead, the models together earn `0.03` against the price's `1.00`.
+
+Two details are worth more than the headline.
+
+Reweighting the closing price makes it worse. The fitted weight is 1.06 rather than 1.00, which hints that the closing line is fractionally underconfident, but acting on that hint costs 0.0008 RPS. Estimating six parameters is not free, and here it is worth less than nothing: even when the market is the answer, *learning* that the market is the answer costs something.
+
+With the price removed, the expected goals model earns the largest share of the four: `0.39`, against `0.21` for Elo, `0.16` for pi-ratings and `0.09` for Dixon-Coles on goals. Put the price back and its weight collapses to `0.02`. Expected goals carry real information; the market has already read it.
+
+### Why the scoring rules are not accuracy
+
+Accuracy invites a misreading that this table makes concrete. Over those 760 matches the closing line predicts a draw **zero times**. Draws happen in about a quarter of matches, but a draw is almost never the single most likely outcome, so any metric that looks only at the argmax cannot see them, and any model tuned for accuracy learns to never name one.
+
+| Forecaster | Accuracy | Home precision | Away precision | Draws called |
+|---|---|---|---|---|
+| Closing line | 52.5% | 0.536 | 0.505 | 0 |
+| Closing price + models | 51.6% | 0.540 | 0.480 | 1 |
+
+Nine matches separate the best and worst rows, which is noise. RPS is the primary metric here because it charges for the probability given to what actually happened, including the quarter of matches that end level.
+
 ## What this means
 
 The Premier League match-result market is efficient enough that a well-specified goal model, fitted carefully and validated without leakage, adds nothing to it. That is a real answer to a real question, and it is worth more than a tuned number that would not survive contact with a bookmaker.
@@ -157,10 +191,11 @@ The report carries a fingerprint of its own contents, so whatever publishes it c
 - `src/backtest.py`: the walk-forward harness, which refuses to leak
 - `src/betting.py`: pooling, edge, Kelly staking, bankroll simulation and a matchday bootstrap
 - `src/metrics.py`: RPS, log loss, Brier, ignorance, calibration, and a paired matchday bootstrap for comparing two forecasters
+- `src/stacking.py`: logarithmic pooling with the weights fitted rather than chosen from a grid
 - `src/llm_panel.py`: the OpenRouter panel, recorded before kick-off
 - `analysis/`: the studies above, the daily forecast, and the report
 - `.github/workflows/forecast.yml`: the whole routine on a daily cron, publishing to a `results` branch
-- `tests/`: 173 tests, none of which touch the network
+- `tests/`: 182 tests, none of which touch the network
 
 ## Running it
 
@@ -172,6 +207,7 @@ uv venv && uv pip install -r requirements.txt
 .venv/bin/python -m analysis.run_baseline     # what the market scores
 .venv/bin/python -m analysis.run_backtest     # every forecaster, walk-forward
 .venv/bin/python -m analysis.run_betting      # is there any value to take
+.venv/bin/python -m analysis.run_stacking     # what is each forecaster worth
 .venv/bin/python -m analysis.predict_next     # the coming matchweek
 .venv/bin/python -m analysis.build_report     # the page in results/report.html
 ```

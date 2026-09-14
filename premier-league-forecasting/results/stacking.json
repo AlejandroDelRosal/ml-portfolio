@@ -1,0 +1,217 @@
+{
+  "matches": 760,
+  "scores": {
+    "linea de cierre (referencia)": {
+      "n": 760,
+      "rps": 0.2004297884549208,
+      "log_loss": 0.9895228640907063,
+      "brier": 0.5919008098658508,
+      "ignorance": 1.4275797288699048,
+      "accuracy": 0.525
+    },
+    "mercado cierre, solo": {
+      "n": 760,
+      "rps": 0.20121550116520243,
+      "log_loss": 0.9916977888414089,
+      "brier": 0.5937894585106791,
+      "ignorance": 1.430717482022052,
+      "accuracy": 0.5157894736842106
+    },
+    "mercado apertura, solo": {
+      "n": 760,
+      "rps": 0.2021799550960188,
+      "log_loss": 0.9950368166942128,
+      "brier": 0.5966724924350172,
+      "ignorance": 1.435534680946681,
+      "accuracy": 0.5144736842105263
+    },
+    "apertura + modelos": {
+      "n": 760,
+      "rps": 0.20244675649539756,
+      "log_loss": 0.9958834904204374,
+      "brier": 0.5972776245589825,
+      "ignorance": 1.4367561729327565,
+      "accuracy": 0.5144736842105263
+    },
+    "cierre + modelos": {
+      "n": 760,
+      "rps": 0.20124609717275901,
+      "log_loss": 0.9918590111056866,
+      "brier": 0.5938849169789955,
+      "ignorance": 1.4309500765832048,
+      "accuracy": 0.5157894736842106
+    },
+    "solo modelos": {
+      "n": 760,
+      "rps": 0.20534029375375842,
+      "log_loss": 1.006042370441037,
+      "brier": 0.6033119155608951,
+      "ignorance": 1.4514123387594604,
+      "accuracy": 0.5013157894736842
+    }
+  },
+  "significance": {
+    "mercado cierre, solo": {
+      "mean": -0.000785712710281303,
+      "low": -0.0018182602821426343,
+      "high": 0.0002203837716879873,
+      "better_share": 0.0623
+    },
+    "mercado apertura, solo": {
+      "mean": -0.0017501666410979844,
+      "low": -0.0035074220182274734,
+      "high": -6.0280434745771106e-05,
+      "better_share": 0.0211
+    },
+    "apertura + modelos": {
+      "mean": -0.0020169680404768364,
+      "low": -0.0037675928925232634,
+      "high": -0.00031743900861469314,
+      "better_share": 0.0106
+    },
+    "cierre + modelos": {
+      "mean": -0.000816308717838108,
+      "low": -0.0018513710259121395,
+      "high": 0.00019724490249776729,
+      "better_share": 0.0576
+    },
+    "solo modelos": {
+      "mean": -0.004910505298837721,
+      "low": -0.008404182572937641,
+      "high": -0.0013476823019278922,
+      "better_share": 0.0043
+    }
+  },
+  "weights": {
+    "mercado cierre, solo": {
+      "cierre": 1.0617
+    },
+    "mercado apertura, solo": {
+      "apertura": 1.0403
+    },
+    "apertura + modelos": {
+      "apertura": 1.0002,
+      "dixon_coles": 0.0,
+      "dixon_coles_xg": 0.0247,
+      "elo": 0.0,
+      "pi_ratings": 0.0084
+    },
+    "cierre + modelos": {
+      "cierre": 1.0617,
+      "dixon_coles": 0.0,
+      "dixon_coles_xg": 0.0,
+      "elo": 0.0,
+      "pi_ratings": 0.0
+    },
+    "solo modelos": {
+      "dixon_coles": 0.0946,
+      "dixon_coles_xg": 0.3911,
+      "elo": 0.2076,
+      "pi_ratings": 0.1554
+    }
+  },
+  "precision_recall": {
+    "linea de cierre (referencia)": {
+      "H": {
+        "called": 481,
+        "precision": 0.5363825363825364,
+        "recall": 0.8138801261829653
+      },
+      "D": {
+        "called": 0,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      "A": {
+        "called": 279,
+        "precision": 0.5053763440860215,
+        "recall": 0.573170731707317
+      }
+    },
+    "mercado cierre, solo": {
+      "H": {
+        "called": 459,
+        "precision": 0.5403050108932462,
+        "recall": 0.7823343848580442
+      },
+      "D": {
+        "called": 1,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "A": {
+        "called": 300,
+        "precision": 0.48,
+        "recall": 0.5853658536585366
+      }
+    },
+    "mercado apertura, solo": {
+      "H": {
+        "called": 472,
+        "precision": 0.5317796610169492,
+        "recall": 0.7917981072555205
+      },
+      "D": {
+        "called": 0,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      "A": {
+        "called": 288,
+        "precision": 0.4861111111111111,
+        "recall": 0.5691056910569106
+      }
+    },
+    "apertura + modelos": {
+      "H": {
+        "called": 474,
+        "precision": 0.5316455696202531,
+        "recall": 0.7949526813880127
+      },
+      "D": {
+        "called": 0,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      "A": {
+        "called": 286,
+        "precision": 0.486013986013986,
+        "recall": 0.5650406504065041
+      }
+    },
+    "cierre + modelos": {
+      "H": {
+        "called": 459,
+        "precision": 0.5403050108932462,
+        "recall": 0.7823343848580442
+      },
+      "D": {
+        "called": 1,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "A": {
+        "called": 300,
+        "precision": 0.48,
+        "recall": 0.5853658536585366
+      }
+    },
+    "solo modelos": {
+      "H": {
+        "called": 456,
+        "precision": 0.5241228070175439,
+        "recall": 0.7539432176656151
+      },
+      "D": {
+        "called": 0,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      "A": {
+        "called": 304,
+        "precision": 0.46710526315789475,
+        "recall": 0.5772357723577236
+      }
+    }
+  }
+}
