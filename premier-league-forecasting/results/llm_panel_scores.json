@@ -1,0 +1,42 @@
+{
+  "dots-studio/dots-3-note-preview:free": {
+    "n": 4,
+    "rps": 0.19343749999999998,
+    "log_loss": 0.7949137779287299,
+    "brier": 0.45624999999999993,
+    "ignorance": 1.146818165352089,
+    "accuracy": 1.0
+  },
+  "inclusionai/ling-3.0-flash-vl:free": {
+    "n": 4,
+    "rps": 0.22165,
+    "log_loss": 0.8907820622020939,
+    "brier": 0.5163500000000001,
+    "ignorance": 1.2851268636518052,
+    "accuracy": 0.75
+  },
+  "nvidia/nemotron-3-ultra-550b-a55b:free": {
+    "n": 4,
+    "rps": 0.18448750000000003,
+    "log_loss": 0.7630756562605963,
+    "brier": 0.42845000000000005,
+    "ignorance": 1.1008854651102538,
+    "accuracy": 0.75
+  },
+  "nvidia/nemotron-3.5-lightning:free": {
+    "n": 4,
+    "rps": 0.22458749999999997,
+    "log_loss": 0.8861791936051884,
+    "brier": 0.5207999999999999,
+    "ignorance": 1.2784863279531857,
+    "accuracy": 0.5
+  },
+  "market_opening": {
+    "n": 16,
+    "rps": 0.16086734248067536,
+    "log_loss": 0.6988447690059822,
+    "brier": 0.3825471610216265,
+    "ignorance": 1.008219882596124,
+    "accuracy": 1.0
+  }
+}
