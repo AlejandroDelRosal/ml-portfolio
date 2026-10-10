@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-09T13:24:39.689358",
+  "generated_at": "2026-10-10T12:43:26.618330",
   "settings": {
     "xi": 0.003,
     "weight": 0.0,
@@ -7,24 +7,6 @@
     "demonstrable_edge": false
   },
   "fixtures": [
-    {
-      "Datetime": "2026-10-10T12:30:00.000",
-      "HomeTeam": "Arsenal",
-      "AwayTeam": "Leeds",
-      "AvgH": 1.38,
-      "AvgD": 4.78,
-      "AvgA": 7.89,
-      "p_home": 0.6989825101,
-      "p_draw": 0.1909804094,
-      "p_away": 0.1100370805,
-      "p_home_model": 0.6164713451,
-      "p_draw_model": 0.2521198927,
-      "p_away_model": 0.1314087622,
-      "p_home_market": 0.6989825101,
-      "p_draw_market": 0.1909804094,
-      "p_away_market": 0.1100370805,
-      "Season": "2026-27"
-    },
     {
       "Datetime": "2026-10-10T15:00:00.000",
       "HomeTeam": "Aston Villa",
