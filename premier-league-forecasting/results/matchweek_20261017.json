@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-16T11:28:15.520141",
+  "generated_at": "2026-10-17T10:59:36.623799",
   "settings": {
     "xi": 0.003,
     "weight": 0.0,
@@ -37,7 +37,7 @@
       "p_away": 0.340221055,
       "p_home_model": 0.394515145,
       "p_draw_model": 0.2650576175,
-      "p_away_model": 0.3404272375,
+      "p_away_model": 0.3404272374,
       "p_home_market": 0.4042136066,
       "p_draw_market": 0.2555653384,
       "p_away_market": 0.340221055,
