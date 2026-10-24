@@ -1,0 +1,254 @@
+{
+  "asked_at": "2026-10-24T11:06:05.462309",
+  "models": [
+    "dots-studio/dots-3-note-preview:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "nvidia/nemotron-3.5-lightning:free",
+    "nvidia/nemotron-3.5-super-vl:free"
+  ],
+  "fixtures": [
+    {
+      "kickoff": "2026-10-24T12:30:00",
+      "home": "Aston Villa",
+      "away": "Man City",
+      "forecasts": {
+        "dots-studio/dots-3-note-preview:free": [
+          0.2,
+          0.25,
+          0.55
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.2,
+          0.25,
+          0.55
+        ],
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.25,
+          0.27,
+          0.48
+        ],
+        "nvidia/nemotron-3.5-super-vl:free": [
+          0.3,
+          0.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-10-24T15:00:00",
+      "home": "Arsenal",
+      "away": "Everton",
+      "forecasts": {
+        "dots-studio/dots-3-note-preview:free": [
+          0.65,
+          0.25,
+          0.1
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.65,
+          0.22,
+          0.13
+        ],
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.53,
+          0.27,
+          0.2
+        ],
+        "nvidia/nemotron-3.5-super-vl:free": [
+          0.65,
+          0.2,
+          0.15
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-10-24T15:00:00",
+      "home": "Coventry",
+      "away": "Fulham",
+      "forecasts": {
+        "dots-studio/dots-3-note-preview:free": [
+          0.45,
+          0.25,
+          0.3
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.22,
+          0.28,
+          0.5
+        ],
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.18,
+          0.25,
+          0.57
+        ],
+        "nvidia/nemotron-3.5-super-vl:free": [
+          0.3,
+          0.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-10-24T17:30:00",
+      "home": "Chelsea",
+      "away": "Tottenham",
+      "forecasts": {
+        "dots-studio/dots-3-note-preview:free": [
+          0.45,
+          0.25,
+          0.3
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.38,
+          0.3,
+          0.32
+        ],
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.42,
+          0.26,
+          0.32
+        ],
+        "nvidia/nemotron-3.5-super-vl:free": [
+          0.4,
+          0.25,
+          0.35
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-10-25T14:00:00",
+      "home": "Crystal Palace",
+      "away": "Newcastle",
+      "forecasts": {
+        "dots-studio/dots-3-note-preview:free": [
+          0.45,
+          0.25,
+          0.3
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.27,
+          0.28,
+          0.45
+        ],
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.44,
+          0.27,
+          0.29
+        ],
+        "nvidia/nemotron-3.5-super-vl:free": [
+          0.3,
+          0.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-10-25T14:00:00",
+      "home": "Hull",
+      "away": "Brentford",
+      "forecasts": {
+        "dots-studio/dots-3-note-preview:free": [
+          0.35,
+          0.25,
+          0.4
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.2,
+          0.25,
+          0.55
+        ],
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.2,
+          0.25,
+          0.55
+        ],
+        "nvidia/nemotron-3.5-super-vl:free": [
+          0.3,
+          0.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-10-25T14:00:00",
+      "home": "Liverpool",
+      "away": "Brighton",
+      "forecasts": {
+        "dots-studio/dots-3-note-preview:free": [
+          0.65,
+          0.25,
+          0.1
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.6,
+          0.22,
+          0.18
+        ],
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.58,
+          0.25,
+          0.17
+        ],
+        "nvidia/nemotron-3.5-super-vl:free": [
+          0.55,
+          0.25,
+          0.2
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-10-25T14:00:00",
+      "home": "Man United",
+      "away": "Bournemouth",
+      "forecasts": {
+        "dots-studio/dots-3-note-preview:free": [
+          0.7,
+          0.25,
+          0.05
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.48,
+          0.27,
+          0.25
+        ],
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.6,
+          0.25,
+          0.15
+        ],
+        "nvidia/nemotron-3.5-super-vl:free": [
+          0.45,
+          0.25,
+          0.3
+        ]
+      }
+    },
+    {
+      "kickoff": "2026-10-25T16:30:00",
+      "home": "Sunderland",
+      "away": "Leeds",
+      "forecasts": {
+        "dots-studio/dots-3-note-preview:free": [
+          0.45,
+          0.25,
+          0.3
+        ],
+        "nvidia/nemotron-3-ultra-550b-a55b:free": [
+          0.34,
+          0.3,
+          0.36
+        ],
+        "nvidia/nemotron-3.5-lightning:free": [
+          0.19,
+          0.25,
+          0.56
+        ],
+        "nvidia/nemotron-3.5-super-vl:free": [
+          0.4,
+          0.25,
+          0.35
+        ]
+      }
+    }
+  ]
+}
