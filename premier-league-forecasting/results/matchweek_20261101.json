@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-11-01T12:28:53.884098",
+  "settings": {
+    "xi": 0.003,
+    "weight": 0.0,
+    "min_edge": 0.0,
+    "demonstrable_edge": false
+  },
+  "fixtures": [
+    {
+      "Datetime": "2026-11-01T16:30:00.000",
+      "HomeTeam": "Liverpool",
+      "AwayTeam": "Arsenal",
+      "AvgH": 2.91,
+      "AvgD": 3.4,
+      "AvgA": 2.33,
+      "p_home": 0.3215152665,
+      "p_draw": 0.27281979,
+      "p_away": 0.4056649435,
+      "p_home_model": 0.2573025161,
+      "p_draw_model": 0.2913575511,
+      "p_away_model": 0.4513399328,
+      "p_home_market": 0.3215152665,
+      "p_draw_market": 0.27281979,
+      "p_away_market": 0.4056649435,
+      "Season": "2026-27"
+    },
+    {
+      "Datetime": "2026-11-02T20:00:00.000",
+      "HomeTeam": "Newcastle",
+      "AwayTeam": "Everton",
+      "AvgH": 2.28,
+      "AvgD": 3.53,
+      "AvgA": 2.89,
+      "p_home": 0.4145893534,
+      "p_draw": 0.2618723499,
+      "p_away": 0.3235382968,
+      "p_home_model": 0.4530445899,
+      "p_draw_model": 0.2787580976,
+      "p_away_model": 0.2681973124,
+      "p_home_market": 0.4145893534,
+      "p_draw_market": 0.2618723499,
+      "p_away_market": 0.3235382968,
+      "Season": "2026-27"
+    }
+  ],
+  "picks": []
+}
