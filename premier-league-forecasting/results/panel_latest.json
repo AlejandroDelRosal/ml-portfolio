@@ -9,38 +9,6 @@
   ],
   "fixtures": [
     {
-      "kickoff": "2026-11-06T20:00:00",
-      "home": "Everton",
-      "away": "Coventry",
-      "forecasts": {
-        "dots-studio/dots-3-note-preview:free": [
-          0.5,
-          0.3,
-          0.2
-        ],
-        "nvidia/nemotron-3-ultra-550b-a55b:free": [
-          0.55,
-          0.25,
-          0.2
-        ],
-        "nvidia/nemotron-3.5-lightning:free": [
-          0.53,
-          0.27,
-          0.2
-        ],
-        "nvidia/nemotron-3.5-super-vl:free": [
-          0.5,
-          0.25,
-          0.25
-        ],
-        "recursive/flint-v1.0:free": [
-          0.4,
-          0.27,
-          0.33
-        ]
-      }
-    },
-    {
       "kickoff": "2026-11-07T12:30:00",
       "home": "Leeds",
       "away": "Tottenham",

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-06T13:34:37.441860",
+  "generated_at": "2026-11-07T12:15:15.487904",
   "settings": {
     "xi": 0.003,
     "weight": 0.0,
@@ -7,24 +7,6 @@
     "demonstrable_edge": false
   },
   "fixtures": [
-    {
-      "Datetime": "2026-11-06T20:00:00.000",
-      "HomeTeam": "Everton",
-      "AwayTeam": "Coventry",
-      "AvgH": 1.67,
-      "AvgD": 3.95,
-      "AvgA": 4.79,
-      "p_home": 0.5749367042,
-      "p_draw": 0.2343697061,
-      "p_away": 0.1906935897,
-      "p_home_model": 0.4432186236,
-      "p_draw_model": 0.3072627832,
-      "p_away_model": 0.2495185933,
-      "p_home_market": 0.5749367042,
-      "p_draw_market": 0.2343697061,
-      "p_away_market": 0.1906935897,
-      "Season": "2026-27"
-    },
     {
       "Datetime": "2026-11-07T12:30:00.000",
       "HomeTeam": "Leeds",
