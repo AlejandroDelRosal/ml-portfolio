@@ -8,33 +8,6 @@
   ],
   "fixtures": [
     {
-      "kickoff": "2026-11-21T12:30:00",
-      "home": "Man City",
-      "away": "Fulham",
-      "forecasts": {
-        "baidu/ernie-5.5-flash-preview:free": [
-          0.7000000000000001,
-          0.20000000000000004,
-          0.10000000000000002
-        ],
-        "nvidia/nemotron-3-ultra-550b-a55b:free": [
-          0.63,
-          0.22,
-          0.15
-        ],
-        "nvidia/nemotron-3.5-lightning:free": [
-          0.58,
-          0.25,
-          0.17
-        ],
-        "nvidia/nemotron-3.5-super-vl:free": [
-          0.65,
-          0.2,
-          0.15
-        ]
-      }
-    },
-    {
       "kickoff": "2026-11-21T15:00:00",
       "home": "Aston Villa",
       "away": "Sunderland",

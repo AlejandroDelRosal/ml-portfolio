@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-20T14:44:24.015211",
+  "generated_at": "2026-11-21T13:59:43.420998",
   "settings": {
     "xi": 0.003,
     "weight": 0.0,
@@ -7,24 +7,6 @@
     "demonstrable_edge": false
   },
   "fixtures": [
-    {
-      "Datetime": "2026-11-21T12:30:00.000",
-      "HomeTeam": "Man City",
-      "AwayTeam": "Fulham",
-      "AvgH": 1.37,
-      "AvgD": 5.13,
-      "AvgA": 7.17,
-      "p_home": 0.7026442198,
-      "p_draw": 0.1758628164,
-      "p_away": 0.1214929638,
-      "p_home_model": 0.6581299449,
-      "p_draw_model": 0.211017945,
-      "p_away_model": 0.1308521101,
-      "p_home_market": 0.7026442198,
-      "p_draw_market": 0.1758628164,
-      "p_away_market": 0.1214929638,
-      "Season": "2026-27"
-    },
     {
       "Datetime": "2026-11-21T15:00:00.000",
       "HomeTeam": "Aston Villa",
