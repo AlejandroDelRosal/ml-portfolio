@@ -8,60 +8,6 @@
   ],
   "fixtures": [
     {
-      "kickoff": "2026-11-22T14:00:00",
-      "home": "Hull",
-      "away": "Brighton",
-      "forecasts": {
-        "baidu/ernie-5.5-flash-preview:free": [
-          0.25,
-          0.27,
-          0.48
-        ],
-        "nvidia/nemotron-3-ultra-550b-a55b:free": [
-          0.21,
-          0.26,
-          0.53
-        ],
-        "nvidia/nemotron-3.5-lightning:free": [
-          0.35000000000000003,
-          0.30000000000000004,
-          0.35000000000000003
-        ],
-        "nvidia/nemotron-3.5-super-vl:free": [
-          0.3,
-          0.28,
-          0.42
-        ]
-      }
-    },
-    {
-      "kickoff": "2026-11-22T16:30:00",
-      "home": "Liverpool",
-      "away": "Man United",
-      "forecasts": {
-        "baidu/ernie-5.5-flash-preview:free": [
-          0.62,
-          0.22,
-          0.16
-        ],
-        "nvidia/nemotron-3-ultra-550b-a55b:free": [
-          0.48,
-          0.26,
-          0.26
-        ],
-        "nvidia/nemotron-3.5-lightning:free": [
-          0.44,
-          0.28,
-          0.28
-        ],
-        "nvidia/nemotron-3.5-super-vl:free": [
-          0.55,
-          0.23,
-          0.22
-        ]
-      }
-    },
-    {
       "kickoff": "2026-11-23T20:00:00",
       "home": "Brentford",
       "away": "Everton",
