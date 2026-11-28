@@ -9,38 +9,6 @@
   ],
   "fixtures": [
     {
-      "kickoff": "2026-11-27T20:00:00",
-      "home": "Nott'm Forest",
-      "away": "Chelsea",
-      "forecasts": {
-        "baidu/ernie-5.5-flash-preview:free": [
-          0.3,
-          0.27,
-          0.43
-        ],
-        "nvidia/nemotron-3-ultra-550b-a55b:free": [
-          0.35,
-          0.28,
-          0.37
-        ],
-        "nvidia/nemotron-3.5-lightning:free": [
-          0.3,
-          0.25,
-          0.45
-        ],
-        "nvidia/nemotron-3.5-super-vl:free": [
-          0.3,
-          0.26,
-          0.44
-        ],
-        "particle-ai/particle-1:free": [
-          0.31,
-          0.27,
-          0.42
-        ]
-      }
-    },
-    {
       "kickoff": "2026-11-28T15:00:00",
       "home": "Leeds",
       "away": "Coventry",

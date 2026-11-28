@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-27T15:57:04.558685",
+  "generated_at": "2026-11-28T14:53:46.231797",
   "settings": {
     "xi": 0.003,
     "weight": 0.0,
@@ -7,24 +7,6 @@
     "demonstrable_edge": false
   },
   "fixtures": [
-    {
-      "Datetime": "2026-11-27T20:00:00.000",
-      "HomeTeam": "Nott'm Forest",
-      "AwayTeam": "Chelsea",
-      "AvgH": 2.41,
-      "AvgD": 3.34,
-      "AvgA": 2.88,
-      "p_home": 0.3934947507,
-      "p_draw": 0.2797092986,
-      "p_away": 0.3267959508,
-      "p_home_model": 0.3971952241,
-      "p_draw_model": 0.2665434692,
-      "p_away_model": 0.3362613067,
-      "p_home_market": 0.3934947507,
-      "p_draw_market": 0.2797092986,
-      "p_away_market": 0.3267959508,
-      "Season": "2026-27"
-    },
     {
       "Datetime": "2026-11-28T15:00:00.000",
       "HomeTeam": "Leeds",
